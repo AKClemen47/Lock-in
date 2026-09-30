@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cocon — choix des ambiances</title>
+<style>
+  :root { --bg: #0e0d14; --panel: rgb(20 18 34 / .46); --line: rgb(255 255 255 / .12); --text: #f2f0f7; --muted: #a9a5b8; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 system-ui, "Segoe UI", sans-serif; }
+  header { padding: 28px 24px 8px; max-width: 1200px; margin: auto; }
+  h1 { margin: 0; font-size: 26px; letter-spacing: -.01em; }
+  header p { margin: 6px 0 0; color: var(--muted); }
+  section { max-width: 1200px; margin: 24px auto; padding: 0 24px; }
+  h2 { font-size: 18px; margin: 0 0 12px; display: flex; gap: 10px; align-items: baseline; }
+  h2 small { color: var(--muted); font-weight: 400; font-size: 13px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+  .card { background: #17151f; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; cursor: pointer; transition: transform .15s, border-color .15s; text-align: left; color: inherit; font: inherit; padding: 0; }
+  .card:hover, .card:focus-visible { transform: translateY(-2px); border-color: var(--accent); outline: none; }
+  .card video, .card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; background: #000; }
+  .meta { padding: 10px 12px; display: flex; justify-content: space-between; gap: 8px; font-size: 13px; }
+  .tag { font-weight: 700; color: var(--accent); }
+  .meta span:last-child { color: var(--muted); }
+  /* Mockup */
+  #mock { position: fixed; inset: 0; display: none; background: #000; z-index: 10; }
+  #mock.on { display: block; }
+  #mock video, #mock img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  #mi { animation: kb 45s ease-in-out infinite alternate; transform-origin: 60% 40%; }
+  @keyframes kb { from { transform: scale(1); } to { transform: scale(1.14) translate(-2%, -1%); } }
+  .ph { position: absolute; left: 8px; top: 8px; background: rgb(0 0 0 / .55); border-radius: 99px; padding: 2px 8px; font-size: 11px; }
+  .card { position: relative; }
+  #scrim { position: absolute; inset: 0; background: rgb(8 7 14 / var(--s, .35)); }
+  .ui { position: absolute; inset: 16px; display: flex; gap: 12px; }
+  .glass { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; backdrop-filter: blur(18px) saturate(1.2); }
+  .side { width: 210px; padding: 16px; }
+  .side b { display: block; margin-bottom: 14px; }
+  .side div { padding: 7px 10px; border-radius: 9px; font-size: 14px; color: var(--muted); }
+  .side div.act { background: rgb(255 255 255 / .08); color: var(--text); }
+  .main { flex: 1; padding: 22px; }
+  .main h3 { margin: 0 0 4px; font-size: 24px; }
+  .task { margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: rgb(255 255 255 / .05); display: flex; gap: 10px; align-items: center; font-size: 14px; }
+  .task i { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--accent); }
+  .timer { width: 330px; padding: 22px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  .ring { position: relative; width: 220px; height: 220px; display: grid; place-items: center; }
+  .ring svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+  .clock { font-size: 52px; font-weight: 300; font-variant-numeric: tabular-nums; }
+  .play { width: 64px; height: 64px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; color: #1a1522; font-size: 22px; }
+  .bar { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); display: flex; gap: 12px; align-items: center; padding: 10px 14px; border-radius: 14px; font-size: 13px; z-index: 2; }
+  .bar { flex-wrap: wrap; justify-content: center; white-space: nowrap; max-width: calc(100% - 32px); }
+  .bar button { background: rgb(255 255 255 / .1); color: var(--text); border: 1px solid var(--line); border-radius: 9px; padding: 6px 12px; font: inherit; cursor: pointer; }
+  .bar input { accent-color: var(--accent); }
+  @media (max-width: 800px) { .side, .main { display: none; } .timer { margin: auto; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Choisis tes ambiances</h1>
+  <p>Vraies vidéos filmées (Pexels, licence gratuite). Survole pour voir l'aperçu, clique pour voir le rendu dans Cocon. Choisis une lettre pour la forêt et une pour la soirée studieuse.</p>
+</header>
+<div id="list"></div>
+
+<div id="mock" role="dialog" aria-label="Aperçu dans Cocon">
+  <video id="mv" muted loop playsinline autoplay></video>
+  <img id="mi" alt="" hidden>
+  <div id="scrim"></div>
+  <div class="ui">
+    <div class="glass side"><b>🌱 Cocon</b><div class="act">☀️ Aujourd'hui</div><div>🌥️ Demain</div><div>📅 7 prochains jours</div><div>📥 Boîte de réception</div><div style="margin-top:14px">● Mathématiques</div><div>● Histoire</div></div>
+    <div class="glass main"><h3>Aujourd'hui</h3><span style="color:var(--muted);font-size:14px">2 tâches · ≈ 3 🍅 · fin vers 19 h 40</span>
+      <div class="task"><i></i>Réviser chapitre 3 <span style="margin-left:auto;color:var(--muted)">🍅 1/3</span></div>
+      <div class="task"><i></i>Exercices probas <span style="margin-left:auto;color:var(--muted)">🍅 0/2</span></div></div>
+    <div class="glass timer">
+      <div class="ring"><svg viewBox="0 0 220 220"><circle cx="110" cy="110" r="102" fill="none" stroke="rgb(255 255 255 / .12)" stroke-width="8"/><circle cx="110" cy="110" r="102" fill="none" stroke="var(--accent)" stroke-width="8" stroke-linecap="round" stroke-dasharray="641" stroke-dashoffset="220"/></svg>
+        <div style="text-align:center"><div class="clock">16:24</div><div style="color:var(--muted);font-size:14px">Focus</div></div></div>
+      <div class="play">❚❚</div>
+      <div style="color:var(--muted);font-size:13px">Réviser chapitre 3</div>
+    </div>
+  </div>
+  <div class="glass bar"><span id="mt"></span><label>Voile <input id="sl" type="range" min="0" max="0.8" step="0.05" value="0.35"></label><button id="ui">Masquer l'interface</button><button id="close">Fermer ✕</button></div>
+</div>
+
+<script>
+const V = [{"id": 946600, "d": 61, "author": "Scribble Nerd", "preview": "https://videos.pexels.com/video-files/946600/946600-sd_640_360_30fps.mp4", "md": "https://videos.pexels.com/video-files/946600/946600-hd_1280_720_30fps.mp4", "poster": "https://images.pexels.com/videos/946600/free-video-946600.jpg?auto=compress&w=1280", "mb": "20.9"}, {"id": 4458918, "d": 10, "author": "Imeel Bagdisar", "preview": "https://videos.pexels.com/video-files/4458918/4458918-sd_640_360_30fps.mp4", "md": "https://videos.pexels.com/video-files/4458918/4458918-hd_1280_720_60fps.mp4", "poster": "https://images.pexels.com/videos/4458918/regen-4458918.jpeg?auto=compress&w=1280", "mb": "3.4"}, {"id": 5366344, "d": 12, "author": "Zuzanna Musial", "preview": "https://videos.pexels.com/video-files/5366344/5366344-sd_640_360_30fps.mp4", "md": "https://videos.pexels.com/video-files/5366344/5366344-hd_1280_720_30fps.mp4", "poster": "https://images.pexels.com/videos/5366344/watching-the-rain-though-my-window-5366344.jpeg?auto=compress&w=1280", "mb": "4.3"}, {"id": 7208171, "d": 85, "author": "Sev", "preview": "https://videos.pexels.com/video-files/7208171/7208171-sd_640_360_30fps.mp4", "md": "https://videos.pexels.com/video-files/7208171/7208171-hd_1280_720_30fps.mp4", "poster": "https://images.pexels.com/videos/7208171/bedroom-candle-candle-burning-cozy-bedroom-7208171.jpeg?auto=compress&w=1280", "mb": "13.5"}, {"id": 11751758, "d": 306, "author": "Tom Fisk", "preview": "https://videos.pexels.com/video-files/11751758/11751758-sd_640_360_25fps.mp4", "md": "https://videos.pexels.com/video-files/11751758/11751758-hd_1280_720_25fps.mp4", "poster": "https://images.pexels.com/videos/11751758/pexels-photo-11751758.jpeg?auto=compress&w=1280", "mb": "95.7"}, {"id": 15161525, "d": 15, "author": "Phil Desforges", "preview": "https://videos.pexels.com/video-files/15161525/15161525-sd_640_360_24fps.mp4", "md": "https://videos.pexels.com/video-files/15161525/15161525-hd_1280_720_24fps.mp4", "poster": "https://images.pexels.com/videos/15161525/4k-background-blue-by-the-window-15161525.jpeg?auto=compress&w=1280", "mb": "6.2"}, {"id": 16820074, "d": 18, "author": "khanhhoangminh", "preview": "https://videos.pexels.com/video-files/16820074/16820074-sd_640_360_24fps.mp4", "md": "https://videos.pexels.com/video-files/16820074/16820074-hd_1280_720_24fps.mp4", "poster": "https://images.pexels.com/videos/16820074/pexels-photo-16820074.jpeg?auto=compress&w=1280", "mb": "2.5"}, {"id": 18029861, "d": 45, "author": "Ashwin Alok", "preview": "https://videos.pexels.com/video-files/18029861/18029861-sd_640_360_24fps.mp4", "md": "https://videos.pexels.com/video-files/18029861/18029861-hd_1280_720_24fps.mp4", "poster": "https://images.pexels.com/videos/18029861/pexels-photo-18029861.jpeg?auto=compress&w=1280", "mb": "12.3"}, {"id": 26583810, "d": 66, "author": "IslandHopper X", "preview": "https://videos.pexels.com/video-files/26583810/11964984_640_360_24fps.mp4", "md": "https://videos.pexels.com/video-files/26583810/11964986_1280_720_24fps.mp4", "poster": "https://images.pexels.com/videos/26583810/pexels-photo-26583810.jpeg?auto=compress&w=1280", "mb": "28.9"}, {"id": 29992735, "d": 14, "author": "emirkhan bal", "preview": "https://videos.pexels.com/video-files/29992735/12869058_640_360_24fps.mp4", "md": "https://videos.pexels.com/video-files/29992735/12869060_1280_720_24fps.mp4", "poster": "https://images.pexels.com/videos/29992735/bokeh-29992735.jpeg?auto=compress&w=1280", "mb": "9.8"}, {"id": 39425768, "d": 12, "author": "Sergei Starostin", "preview": "https://videos.pexels.com/video-files/39425768/16788382_640_360_30fps.mp4", "md": "https://videos.pexels.com/video-files/39425768/16788384_1280_720_30fps.mp4", "poster": "https://images.pexels.com/videos/39425768/pexels-photo-39425768.jpeg?auto=compress&w=1280", "mb": "0.9"}, {"id": 9586160, "d": 22, "author": "Omega UAV", "preview": "https://videos.pexels.com/video-files/9586160/9586160-sd_640_360_30fps.mp4", "md": "https://videos.pexels.com/video-files/9586160/9586160-hd_1280_720_30fps.mp4", "poster": "https://images.pexels.com/videos/9586160/drone-drone-videography-forest-poland-9586160.jpeg?auto=compress&w=1280", "mb": "7.7"}, {"id": 8149562, "d": 12, "author": "mason buchko", "preview": "https://videos.pexels.com/video-files/8149562/8149562-sd_640_360_24fps.mp4", "md": "https://videos.pexels.com/video-files/8149562/8149562-hd_1280_720_24fps.mp4", "poster": "https://images.pexels.com/videos/8149562/forest-forest-river-river-spring-8149562.jpeg?auto=compress&w=1280", "mb": "4.5"}, {"id": 11514992, "d": 59, "author": "Matthias Groeneveld", "preview": "https://videos.pexels.com/video-files/11514992/11514992-sd_640_360_30fps.mp4", "md": "https://videos.pexels.com/video-files/11514992/11514992-hd_1280_720_30fps.mp4", "poster": "https://images.pexels.com/videos/11514992/pexels-photo-11514992.jpeg?auto=compress&w=1280", "mb": "22.5"}, {"id": 10550175, "d": 60, "author": "Vyacheslav Bobin", "preview": "https://videos.pexels.com/video-files/10550175/10550175-sd_640_360_30fps.mp4", "md": "https://videos.pexels.com/video-files/10550175/10550175-hd_1280_720_30fps.mp4", "poster": "https://images.pexels.com/videos/10550175/pexels-photo-10550175.jpeg?auto=compress&w=1280", "mb": "13.5"}, {"id": 2876707, "d": 25, "author": "Suzy Hazelwood", "preview": "https://videos.pexels.com/video-files/2876707/2876707-sd_640_360_30fps.mp4", "md": "https://videos.pexels.com/video-files/2876707/2876707-hd_1280_720_30fps.mp4", "poster": "https://images.pexels.com/videos/2876707/free-video-2876707.jpg?auto=compress&w=1280", "mb": "9.7"}, {"id": 11029302, "d": 34, "author": "John Biondo", "preview": "https://videos.pexels.com/video-files/11029302/11029302-sd_640_360_30fps.mp4", "md": "https://videos.pexels.com/video-files/11029302/11029302-hd_1280_720_30fps.mp4", "poster": "https://images.pexels.com/videos/11029302/ocean-slow-motion-waves-11029302.jpeg?auto=compress&w=1280", "mb": "11.7"}, {"id": 7843491, "d": 14, "author": "Styves Exantus", "preview": "https://videos.pexels.com/video-files/7843491/7843491-sd_640_360_24fps.mp4", "md": "https://videos.pexels.com/video-files/7843491/7843491-hd_1280_720_24fps.mp4", "poster": "https://images.pexels.com/videos/7843491/pexels-photo-7843491.jpeg?auto=compress&w=1280", "mb": "4.4"}, {"id": 3009253, "d": 22, "author": "Magda Ehlers", "preview": "https://videos.pexels.com/video-files/3009253/3009253-sd_640_360_30fps.mp4", "md": "https://videos.pexels.com/video-files/3009253/3009253-hd_1280_720_30fps.mp4", "poster": "https://images.pexels.com/videos/3009253/free-video-3009253.jpg?auto=compress&w=1280", "mb": "8.6"}, {"id": 29635512, "d": 33, "author": "dp singh Bhullar", "preview": "https://videos.pexels.com/video-files/29635512/12751171_640_360_30fps.mp4", "md": "https://videos.pexels.com/video-files/29635512/12751175_1280_720_30fps.mp4", "poster": "https://images.pexels.com/videos/29635512/pexels-photo-29635512.jpeg?auto=compress&w=1280", "mb": "5.4"}, {"id": 37641753, "d": 17, "author": "vdk musik", "preview": "https://videos.pexels.com/video-files/37641753/15955465_640_360_30fps.mp4", "md": "https://videos.pexels.com/video-files/37641753/15955467_1280_720_30fps.mp4", "poster": "https://images.pexels.com/videos/37641753/pexels-photo-37641753.jpeg?auto=compress&w=1280", "mb": "7.6"}, {"id": 4349485, "d": 38, "author": "Peggy Anke", "preview": "https://videos.pexels.com/video-files/4349485/4349485-sd_640_360_30fps.mp4", "md": "https://videos.pexels.com/video-files/4349485/4349485-hd_1280_720_30fps.mp4", "poster": "https://images.pexels.com/videos/4349485/architectural-design-architecture-architecture-design-asia-4349485.jpeg?auto=compress&w=1280", "mb": "14.5"}, {"id": 30574534, "d": 17, "author": "Oleksandr Plakhota", "preview": "https://videos.pexels.com/video-files/30574534/13092629_640_360_25fps.mp4", "md": "https://videos.pexels.com/video-files/30574534/13092631_1280_720_25fps.mp4", "poster": "https://images.pexels.com/videos/30574534/pexels-photo-30574534.jpeg?auto=compress&w=1280", "mb": "4.2"}, {"id": 14057076, "d": 28, "author": "Carsten Link", "preview": "https://videos.pexels.com/video-files/14057076/14057076-sd_640_360_30fps.mp4", "md": "https://videos.pexels.com/video-files/14057076/14057076-hd_1280_720_30fps.mp4", "poster": "https://images.pexels.com/videos/14057076/pexels-photo-14057076.jpeg?auto=compress&w=1280", "mb": "8.8"}, {"id": 12335802, "d": 14, "author": "Sasha Tonik", "preview": "https://videos.pexels.com/video-files/12335802/12335802-sd_640_360_30fps.mp4", "md": "https://videos.pexels.com/video-files/12335802/12335802-hd_1280_720_60fps.mp4", "poster": "https://images.pexels.com/videos/12335802/early-sunrise-forest-green-forest-light-12335802.jpeg?auto=compress&w=1280", "mb": "5.4"}, {"id": 7157038, "d": 60, "author": "I Am Sorin", "preview": "https://videos.pexels.com/video-files/7157038/7157038-sd_640_360_30fps.mp4", "md": "https://videos.pexels.com/video-files/7157038/7157038-hd_1280_720_30fps.mp4", "poster": "https://images.pexels.com/videos/7157038/pexels-photo-7157038.jpeg?auto=compress&w=1280", "mb": "22.8"}, {"id": 11404058, "d": 70, "author": "I Am Sorin", "preview": "https://videos.pexels.com/video-files/11404058/11404058-sd_640_360_30fps.mp4", "md": "https://videos.pexels.com/video-files/11404058/11404058-hd_1280_720_30fps.mp4", "poster": "https://images.pexels.com/videos/11404058/pexels-photo-11404058.jpeg?auto=compress&w=1280", "mb": "26.7"}, {"id": 13180799, "d": 25, "author": "Matthias Groeneveld", "preview": "https://videos.pexels.com/video-files/13180799/13180799-sd_640_360_30fps.mp4", "md": "https://videos.pexels.com/video-files/13180799/13180799-hd_1280_720_30fps.mp4", "poster": "https://images.pexels.com/videos/13180799/daylight-forest-green-madeira-13180799.jpeg?auto=compress&w=1280", "mb": "9.9"}, {"id": 5909589, "d": 46, "author": "Yaroslav Shuraev", "preview": "https://videos.pexels.com/video-files/5909589/5909589-sd_640_360_24fps.mp4", "md": "https://videos.pexels.com/video-files/5909589/5909589-hd_1280_720_24fps.mp4", "poster": "https://images.pexels.com/videos/5909589/pexels-photo-5909589.jpeg?auto=compress&w=1280", "mb": "7.5"}, {"id": 31253783, "d": 15, "author": "dp singh Bhullar", "preview": "https://videos.pexels.com/video-files/31253783/13347740_640_360_30fps.mp4", "md": "https://videos.pexels.com/video-files/31253783/13347746_1280_720_30fps.mp4", "poster": "https://images.pexels.com/videos/31253783/pexels-photo-31253783.jpeg?auto=compress&w=1280", "mb": "3.4"}, {"id": 7566504, "d": 37, "author": "The Instagrapher", "preview": "https://videos.pexels.com/video-files/7566504/7566504-sd_640_360_24fps.mp4", "md": "https://videos.pexels.com/video-files/7566504/7566504-hd_1280_720_24fps.mp4", "poster": "https://images.pexels.com/videos/7566504/pexels-photo-7566504.jpeg?auto=compress&w=1280", "mb": "13.9"}, {"id": 18969594, "d": 16, "author": "Maksim Smirnov", "preview": "https://videos.pexels.com/video-files/18969594/18969594-sd_640_360_30fps.mp4", "md": "https://videos.pexels.com/video-files/18969594/18969594-hd_1280_720_60fps.mp4", "poster": "https://images.pexels.com/videos/18969594/books-library-18969594.jpeg?auto=compress&w=1280", "mb": "5.6"}, {"id": 10216513, "d": 14, "author": "CityXcape", "preview": "https://videos.pexels.com/video-files/10216513/10216513-sd_640_360_30fps.mp4", "md": "https://videos.pexels.com/video-files/10216513/10216513-hd_1280_720_30fps.mp4", "poster": "https://images.pexels.com/videos/10216513/cityscape-downtown-downtown-memphis-memphis-10216513.jpeg?auto=compress&w=1280", "mb": "3.2"}, {"id": 28872822, "d": 27, "author": "AP Vibes", "preview": "https://videos.pexels.com/video-files/28872822/12501313_640_360_24fps.mp4", "md": "https://videos.pexels.com/video-files/28872822/12501315_1280_720_24fps.mp4", "poster": "https://images.pexels.com/videos/28872822/pexels-photo-28872822.jpeg?auto=compress&w=1280", "mb": "23.4"}, {"id": 34808598, "d": 115, "author": "Sapol Churanon", "preview": "https://videos.pexels.com/video-files/34808598/14758523_640_360_30fps.mp4", "md": "https://videos.pexels.com/video-files/34808598/14758525_1280_720_30fps.mp4", "poster": "https://images.pexels.com/videos/34808598/pexels-photo-34808598.jpeg?auto=compress&w=1280", "mb": "10.3"}];
+const NEW = [
+ {"id":37218119,"d":24,"author":"Saulo Nulo","preview":"https://videos.pexels.com/video-files/37218119/15766867_640_360_30fps.mp4","md":"https://videos.pexels.com/video-files/37218119/15766869_1280_720_30fps.mp4","poster":"https://images.pexels.com/videos/37218119/pexels-photo-37218119.jpeg?auto=compress&w=1280","mb":"25.6"},
+ {"id":7645660,"d":26,"author":"Matthias Groeneveld","preview":"https://videos.pexels.com/video-files/7645660/7645660-sd_640_360_30fps.mp4","md":"https://videos.pexels.com/video-files/7645660/7645660-hd_1280_720_30fps.mp4","poster":"https://images.pexels.com/videos/7645660/early-empty-forest-morning-7645660.jpeg?auto=compress&w=1280","mb":"9.0"},
+ {"id":2711092,"d":21,"author":"K","preview":"https://videos.pexels.com/video-files/2711092/2711092-sd_640_360_24fps.mp4","md":"https://videos.pexels.com/video-files/2711092/2711092-hd_1280_720_24fps.mp4","poster":"https://images.pexels.com/videos/2711092/free-video-2711092.jpg?auto=compress&w=1280","mb":"6.9"},
+ {"id":5448525,"d":32,"author":"Koji Waki","preview":"https://videos.pexels.com/video-files/5448525/5448525-sd_640_360_24fps.mp4","md":"https://videos.pexels.com/video-files/5448525/5448525-hd_1280_720_24fps.mp4","poster":"https://images.pexels.com/videos/5448525/pexels-photo-5448525.jpeg?auto=compress&w=1280","mb":"8.9"},
+ {"id":28872831,"d":9,"author":"AP Vibes","preview":"https://videos.pexels.com/video-files/28872831/12501171_640_360_24fps.mp4","md":"https://videos.pexels.com/video-files/28872831/12501173_1280_720_24fps.mp4","poster":"https://images.pexels.com/videos/28872831/cars-city-lights-road-28872831.jpeg?auto=compress&w=1280","mb":"3.4"},
+];
+[[34118720,'ubeyonroad'],[4091969,'Oliver King'],[5883738,'thiha soe'],[11849146,'Cristian Manieri'],[7535063,'Max Vakhtbovych'],[8163933,'Maurício Mascaro']].forEach(([id, author]) => {
+  const u = w => `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=${w}`;
+  NEW.push({ id, photo: true, author, poster: u(640), md: u(1920) });
+});
+const PX = [[187388,"https://cdn.pixabay.com/video/2023/11/01/187388-880363234",20,"3.2"],[120483,"https://cdn.pixabay.com/video/2022/06/15/120483-720880625",25,"2.7"],[226811,"https://cdn.pixabay.com/video/2024/08/17/226811",59,"4.9"],[227262,"https://cdn.pixabay.com/video/2024/08/19/227262",60,"6.0"],[227260,"https://cdn.pixabay.com/video/2024/08/19/227260",60,"6.5"],[227263,"https://cdn.pixabay.com/video/2024/08/19/227263",60,"4.6"],[227261,"https://cdn.pixabay.com/video/2024/08/19/227261",60,"5.6"],[227265,"https://cdn.pixabay.com/video/2024/08/19/227265",60,"5.8"],[226551,"https://cdn.pixabay.com/video/2024/08/15/226551",59,"3.7"],[181093,"https://cdn.pixabay.com/video/2023/09/17/181093-865745454",21,"2.2"],[150883,"https://cdn.pixabay.com/video/2023/02/16/150883-799711528",21,"7.2"],[171370,"https://cdn.pixabay.com/video/2023/07/13/171370-845439634",60,"7.4"],[116678,"https://cdn.pixabay.com/video/2022/05/11/116678-708909905",31,"7.2"],[181977,"https://cdn.pixabay.com/video/2023/09/23/181977-867576065",60,"3.4"],[246433,"https://cdn.pixabay.com/video/2024/12/12/246433",30,"0.7"],[376554,"https://cdn.pixabay.com/video/2026/09/15/376554",10,"4.7"],[141606,"https://cdn.pixabay.com/video/2022/12/04/141606-777930540",60,"14.0"],[369864,"https://cdn.pixabay.com/video/2026/08/10/369864",10,"2.2"],[175190,"https://cdn.pixabay.com/video/2023/08/08/175190-852857837",30,"2.5"],[202035,"https://cdn.pixabay.com/video/2024/02/26/202035-916894724",31,"10.5"]];
+// Sources HD : "_small" = 960 px, donc on prend "_medium" (1280 px). Sources 4K : "_small" = 1920 px.
+const MED = { 187388: '6.4', 120483: '3.8', 226811: '8.6', 181093: '3.6', 171370: '11.0', 175190: '4.5' };
+PX.forEach(([id, b, d, mb]) => V.push({ id, d, mb: MED[id] ?? mb, author: 'Pixabay', preview: b + '_tiny.mp4', md: b + (MED[id] ? '_medium' : '_small') + '.mp4', poster: b + '_tiny.jpg' }));
+V.push(...NEW);
+const byId = Object.fromEntries(V.map(v => [v.id, v]));
+const SECTIONS = [
+  { name: '✅ Tes choix', accent: '#9be3a8', ids: [15161525, 26583810, 11029302, 30574534, 37218119], labels: ['Pluie', 'Cheminée', 'Mer', 'Café', 'Forêt'] },
+  { name: '🌃 Soirée studieuse — chambre cyberpunk', accent: '#c77dff', ids: [187388, 120483, 226811, 181093, 150883, 171370, 376554, 175190, 202035, 369864] },
+];
+const list = document.getElementById('list');
+SECTIONS.forEach(s => {
+  const sec = document.createElement('section');
+  sec.style.setProperty('--accent', s.accent);
+  sec.innerHTML = `<h2>${s.name}<small>${s.labels ? 'retenus' : s.ids.length + ' options'}</small></h2><div class="grid"></div>`;
+  s.ids.forEach((id, i) => {
+    const v = byId[id], letter = s.labels ? s.labels[i] : String.fromCharCode(65 + i);
+    const b = document.createElement('button');
+    b.className = 'card';
+    b.innerHTML = v.photo
+      ? `<img loading="lazy" alt="" src="${v.poster}"><span class="ph">📷 photo animée</span><div class="meta"><span class="tag">${letter}</span><span>zoom lent · ${v.author}</span></div>`
+      : `<video muted loop playsinline preload="none" poster="${v.poster}" src="${v.preview}"></video><div class="meta"><span class="tag">${letter}</span><span>${v.d} s · ${v.mb} Mo · ${v.author}</span></div>`;
+    const vid = b.querySelector('video');
+    if (vid) { b.onmouseenter = b.onfocus = () => vid.play().catch(() => {}); b.onmouseleave = b.onblur = () => vid.pause(); }
+    b.onclick = () => open(v, s, letter);
+    sec.querySelector('.grid').append(b);
+  });
+  list.append(sec);
+});
+const mock = document.getElementById('mock'), mv = document.getElementById('mv'), mi = document.getElementById('mi');
+function open(v, s, letter) {
+  mock.style.setProperty('--accent', s.accent);
+  mv.hidden = !!v.photo; mi.hidden = !v.photo;
+  if (v.photo) { mi.src = v.md; mv.removeAttribute('src'); } else { mv.poster = v.poster; mv.src = v.md; mv.play().catch(() => {}); }
+  document.getElementById('mt').textContent = `${s.name.split(' (')[0]} — option ${letter}`;
+  mock.classList.add('on');
+}
+document.getElementById('close').onclick = () => { mock.classList.remove('on'); mv.removeAttribute('src'); mv.load(); };
+document.getElementById('sl').oninput = e => mock.style.setProperty('--s', e.target.value);
+document.getElementById('ui').onclick = e => { const u = mock.querySelector('.ui'); const h = u.style.display === 'none'; u.style.display = h ? '' : 'none'; e.target.textContent = h ? 'Masquer l\'interface' : 'Afficher l\'interface'; };
+addEventListener('keydown', e => e.key === 'Escape' && document.getElementById('close').click());
+</script>
+</body>
+</html>
