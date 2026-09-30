@@ -60,7 +60,7 @@ function Data() {
   useEffect(() => void navigator.storage?.persisted?.().then(setPersisted), [])
 
   const doExport = async () => {
-    downloadJson(`cocon-backup-${new Date().toISOString().slice(0, 10)}.json`, await exportAll(settingsSnapshot()))
+    downloadJson(`lock-in-backup-${new Date().toISOString().slice(0, 10)}.json`, await exportAll(settingsSnapshot()))
     set({ lastBackupAt: Date.now() })
   }
   const doImport = async (f: File | undefined) => {
@@ -71,7 +71,7 @@ function Data() {
       set(fixThemes(known as Partial<Settings>))
       toast(`Backup restored: ${b.tasks.length} tasks, ${b.sessions.length} sessions`)
     } catch (e) {
-      toast(e instanceof Error && e.message.includes('Cocon') ? e.message : 'Unreadable file.')
+      toast(e instanceof Error && e.message.includes('Lock-in') ? e.message : 'Unreadable file.')
     }
   }
   const doReset = async () => {
@@ -119,12 +119,12 @@ function Notifications() {
   const ask = async () => setPerm(await Notification.requestPermission())
   return (
     <Card title="Notifications">
-      <Toggle label="Notify at the end of a session and for reminders" hint="Only when Cocon is not in the foreground" checked={on} onChange={(v) => (set({ notify: v }), v && perm === 'default' && void ask())} />
+      <Toggle label="Notify at the end of a session and for reminders" hint="Only when Lock-in is not in the foreground" checked={on} onChange={(v) => (set({ notify: v }), v && perm === 'default' && void ask())} />
       <div className="mt-2 flex items-center gap-2 text-xs text-muted">
         {perm === 'granted' && (
           <>
             ✓ Allowed
-            <Btn variant="ghost" className="px-2 py-1 text-xs" onClick={() => notify('Cocon', 'Notifications work 🌱', true)}>
+            <Btn variant="ghost" className="px-2 py-1 text-xs" onClick={() => notify('Lock-in', 'Notifications work 🌱', true)}>
               Test
             </Btn>
           </>

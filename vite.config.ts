@@ -11,8 +11,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg', 'apple-touch-icon.png'],
       manifest: {
-        name: 'Cocon — study & focus',
-        short_name: 'Cocon',
+        name: 'Lock-in — study & focus',
+        short_name: 'Lock-in',
         description: 'Pomodoro timer, tasks and immersive ambiences for studying.',
         lang: 'en',
         start_url: '.',

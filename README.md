@@ -1,4 +1,4 @@
-# Cocon 🌱
+# Lock-in 🌱
 
 Application d'étude (PWA) : minuteur Pomodoro, tâches par matière, statistiques et petite plante à faire grandir, le tout dans une ambiance animée et sonore. Tout reste sur l'appareil : pas de compte, pas de serveur.
 

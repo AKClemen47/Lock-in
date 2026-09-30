@@ -15,7 +15,7 @@ export function useTimerEngine() {
       const t = useTimer.getState()
       if (t.status !== 'running') {
         lastSecond = -1
-        if (document.title !== 'Cocon') document.title = 'Cocon'
+        if (document.title !== 'Lock-in') document.title = 'Lock-in'
         return
       }
       const rem = M.remaining(t, Date.now())

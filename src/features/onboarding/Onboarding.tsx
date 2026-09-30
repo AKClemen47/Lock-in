@@ -35,7 +35,7 @@ export function Onboarding() {
   }
 
   return (
-    <Modal open={!s.onboarded} onClose={() => void finish()} title={['Welcome to Cocon 🌱', 'Your rhythm', 'Your subjects'][step]} wide>
+    <Modal open={!s.onboarded} onClose={() => void finish()} title={['Welcome to Lock-in 🌱', 'Your rhythm', 'Your subjects'][step]} wide>
       {step === 0 && (
         <div className="space-y-4">
           <p className="text-sm text-muted">A calm corner to study: a Pomodoro timer, your tasks by subject, and an ambience that wraps around you. Pick your scene:</p>

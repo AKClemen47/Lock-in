@@ -99,11 +99,11 @@ export async function exportAll(settings: unknown): Promise<Backup> {
   return { app: 'cocon', version: 1, exportedAt: new Date().toISOString(), settings, projects, tasks, sessions }
 }
 
-/** Replace all data with a backup. Throws on a file that is not a Cocon backup. */
+/** Replace all data with a backup. Throws on a file that is not a Lock-in backup (id still 'cocon', the app's former name). */
 export async function importAll(data: unknown): Promise<Backup> {
   const b = data as Backup
   if (!b || b.app !== 'cocon' || !Array.isArray(b.projects) || !Array.isArray(b.tasks) || !Array.isArray(b.sessions))
-    throw new Error('This file is not a Cocon backup.')
+    throw new Error('This file is not a Lock-in backup.')
   await db.transaction('rw', db.projects, db.tasks, db.sessions, async () => {
     await Promise.all([db.projects.clear(), db.tasks.clear(), db.sessions.clear()])
     await Promise.all([db.projects.bulkAdd(b.projects), db.tasks.bulkAdd(b.tasks), db.sessions.bulkAdd(b.sessions)])
