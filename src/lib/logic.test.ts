@@ -23,7 +23,7 @@ describe('time', () => {
   it('formats durations', () => {
     expect(formatDuration(0)).toBe('0 min')
     expect(formatDuration(45 * MIN)).toBe('45 min')
-    expect(formatDuration(185 * MIN)).toBe('3 h 05')
+    expect(formatDuration(185 * MIN)).toBe('3h 05')
     expect(formatClock(24 * MIN + 59_001)).toBe('25:00')
     expect(formatClock(0)).toBe('00:00')
   })
@@ -72,8 +72,8 @@ describe('timer machine', () => {
 describe('quick add', () => {
   const today = '2026-09-29' // Tuesday
   it('parses every token', () => {
-    expect(parseQuickAdd('Réviser ch.3 #Maths !1 demain 18h30 ~3', today)).toEqual({
-      title: 'Réviser ch.3',
+    expect(parseQuickAdd('Revise ch.3 #Maths !1 tomorrow 6:30pm ~3', today)).toEqual({
+      title: 'Revise ch.3',
       projectName: 'Maths',
       priority: 1,
       dueDate: '2026-09-30',
@@ -82,18 +82,20 @@ describe('quick add', () => {
     })
   })
   it('handles weekdays, dates and multiword projects', () => {
-    expect(parseQuickAdd('Fiche lundi', today).dueDate).toBe('2026-10-05')
-    expect(parseQuickAdd('Fiche mardi', today).dueDate).toBe('2026-10-06')
-    expect(parseQuickAdd('Partiel 15/01', today).dueDate).toBe('2027-01-15')
-    expect(parseQuickAdd('Partiel 31/02', today).dueDate).toBeNull()
-    expect(parseQuickAdd('Lire #Droit_civil aujourd’hui', today)).toMatchObject({ projectName: 'Droit civil', dueDate: today })
-    expect(parseQuickAdd('Appel 9h', today)).toMatchObject({ dueDate: today, dueTime: '09:00', title: 'Appel' })
+    expect(parseQuickAdd('Notes monday', today).dueDate).toBe('2026-10-05')
+    expect(parseQuickAdd('Notes tuesday', today).dueDate).toBe('2026-10-06')
+    expect(parseQuickAdd('Exam 15/01', today).dueDate).toBe('2027-01-15')
+    expect(parseQuickAdd('Exam 31/02', today).dueDate).toBeNull()
+    expect(parseQuickAdd('Read #Civil_law today', today)).toMatchObject({ projectName: 'Civil law', dueDate: today })
+    expect(parseQuickAdd('Call 9am', today)).toMatchObject({ dueDate: today, dueTime: '09:00', title: 'Call' })
+    expect(parseQuickAdd('Call 18:05', today).dueTime).toBe('18:05')
+    expect(parseQuickAdd('Call 12am', today).dueTime).toBe('00:00')
   })
   it('matches projects by accent-free prefix', () => {
-    const projects = [{ name: 'Mathématiques' }, { name: 'Histoire' }, { name: 'Maths old', archived: true }]
-    expect(matchProject('maths', projects)?.name).toBe('Mathématiques')
-    expect(matchProject('hist', projects)?.name).toBe('Histoire')
-    expect(matchProject('droit', projects)).toBeNull()
+    const projects = [{ name: 'Mathematics' }, { name: 'History' }, { name: 'Maths old', archived: true }]
+    expect(matchProject('maths', projects)?.name).toBe('Mathematics')
+    expect(matchProject('hist', projects)?.name).toBe('History')
+    expect(matchProject('law', projects)).toBeNull()
   })
 })
 

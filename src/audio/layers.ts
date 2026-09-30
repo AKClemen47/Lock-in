@@ -1,4 +1,5 @@
 import { noiseBuffer, type NoiseKind } from './noise'
+import { recording } from './recordings'
 
 /** Starts a sound layer into `out`; returns its stop function. */
 export type Layer = (ctx: AudioContext, out: AudioNode) => () => void
@@ -287,7 +288,80 @@ const pad: Layer = (ctx, out) => {
   }
 }
 
+/** A single drop into still water: a round plonk and its faint ring. */
+function plonk(ctx: AudioContext, out: AudioNode, when: number) {
+  const p = panned(ctx, out, rand(-0.5, 0.5))
+  const f = rand(700, 1200)
+  tone(ctx, p, when, f * 0.7, f, 0.08, rand(0.04, 0.08))
+  tone(ctx, p, when + 0.06, f * 2, f * 2.2, 0.4, rand(0.008, 0.015))
+}
+
+/** Wheels over a rail joint: "ta-tam", a dull thump and a metallic tick, front then rear bogie. */
+function clack(ctx: AudioContext, out: AudioNode, when: number) {
+  for (const dt of [0, 0.16]) {
+    burst(ctx, out, when + dt, 0.09, rand(0.5, 0.7), 'lowpass', 160)
+    burst(ctx, out, when + dt, 0.03, rand(0.05, 0.09), 'bandpass', 1800, 2)
+  }
+}
+
+/** Deep-water drone: low sines a fifth apart, breathing very slowly. */
+const drone: Layer = (ctx, out) => {
+  const g = ctx.createGain()
+  g.gain.value = 0.12
+  const lp = filter(ctx, 'lowpass', 220)
+  chain(lp, g, out)
+  const lfo = ctx.createOscillator()
+  const depth = ctx.createGain()
+  lfo.frequency.value = rand(0.025, 0.04)
+  depth.gain.value = 0.05
+  chain(lfo, depth)
+  depth.connect(g.gain)
+  lfo.start()
+  const oscs = [hz(31), hz(38), hz(43)].map((f, i) => {
+    const o = ctx.createOscillator()
+    const v = ctx.createGain()
+    o.frequency.value = f
+    o.detune.value = rand(-6, 6)
+    v.gain.value = [1, 0.6, 0.3][i]
+    chain(o, v, lp)
+    o.start()
+    return o
+  })
+  return () => {
+    oscs.forEach((o) => o.stop())
+    lfo.stop()
+    g.disconnect()
+  }
+}
+
+/** A few air bubbles rising from far below: muffled "bloops", each a little higher. */
+function bloop(ctx: AudioContext, out: AudioNode, when: number) {
+  const p = panned(ctx, out, rand(-0.6, 0.6))
+  const lp = filter(ctx, 'lowpass', 1400)
+  lp.connect(p)
+  const base = rand(250, 450)
+  const n = Math.floor(rand(2, 7))
+  for (let i = 0; i < n; i++) {
+    const f = base * (1 + i * rand(0.08, 0.2))
+    tone(ctx, lp, when + i * rand(0.08, 0.22), f, f * rand(1.6, 2.2), rand(0.06, 0.1), rand(0.03, 0.07))
+  }
+}
+
 export const LAYERS = {
+  fireRec: recording('feu'),
+  rainRec: recording('pluie'),
+  forestRec: recording('foret'),
+  wavesRec: recording('vagues'),
+  cafeRec: recording('cafe'),
+  fountainRec: recording('fontaine'),
+  chimesRec: recording('clochettes', 0, 45), // the recording fades out after 45 s
+  trainRec: recording('train', 40, 145), // cruising speed, without departure and braking
+  drip: events(1 / 6, plonk, () => rand(4, 10)),
+  rails: events(1 / 1.4, clack, () => rand(1.35, 1.45)),
+  hum: bed('brown', [['lowpass', 140], ['highpass', 25]], 1, 0.3, 0.4),
+  deep: combine(drone, bed('brown', [['lowpass', 180], ['highpass', 20]], 0.8, 0.4, 0.3)),
+  current: bed('pink', [['lowpass', 500], ['highpass', 60]], 0.5, 0.7, 0.5),
+  bloops: events(1 / 14, bloop, () => rand(8, 22)),
   rain: bed('pink', [['highpass', 400], ['lowpass', 7500]], 0.9, 0.25),
   drops: events(4, droplet),
   thunder: events(1 / 70, thunder),

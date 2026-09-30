@@ -13,15 +13,15 @@ import { doneUnder, groupTasks, inList, listDefaults, listTitle, remainingPomodo
 import type { Project } from '../../lib/db'
 
 const EMPTY: Record<string, string> = {
-  today: 'Rien de prévu aujourd’hui. Ajoute une tâche ou profite d’une séance libre.',
-  tomorrow: 'Demain est encore libre.',
-  week: 'Aucune échéance dans les 7 prochains jours.',
-  planned: 'Aucune tâche avec échéance.',
-  overdue: 'Aucun retard, bravo !',
-  inbox: 'Toutes tes tâches ont une matière.',
-  all: 'Aucune tâche en cours.',
-  done: 'Aucune tâche terminée pour l’instant.',
-  project: 'Aucune tâche dans cette matière.',
+  today: 'Nothing planned today. Add a task or enjoy a free session.',
+  tomorrow: 'Tomorrow is still free.',
+  week: 'Nothing due in the next 7 days.',
+  planned: 'No tasks with a due date.',
+  overdue: 'Nothing overdue, well done!',
+  inbox: 'All your tasks have a subject.',
+  all: 'No open tasks.',
+  done: 'No completed tasks yet.',
+  project: 'No tasks in this subject.',
 }
 
 function WeeklyGoal({ project }: { project: Project }) {
@@ -36,7 +36,7 @@ function WeeklyGoal({ project }: { project: Project }) {
   return (
     <div className="mt-2 max-w-xs">
       <div className="text-xs text-muted">
-        Cette semaine : {formatDuration(ms)} / {project.weeklyGoal} h
+        This week: {formatDuration(ms)} / {project.weeklyGoal}h
       </div>
       <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-line">
         <div className="h-full rounded-full" style={{ width: `${pct}%`, background: project.color }} />
@@ -74,17 +74,17 @@ export function TaskList() {
         <div className="flex items-center gap-2">
           <h1 className="text-2xl font-semibold tracking-tight">{listTitle(list, projects)}</h1>
           {project && (
-            <IconBtn label="Modifier la matière" onClick={() => editProject(project)}>
+            <IconBtn label="Edit subject" onClick={() => editProject(project)}>
               <Pencil size={15} />
             </IconBtn>
           )}
         </div>
         {!isDone && (
           <p className="mt-1 text-sm text-muted">
-            {open.length} tâche{open.length > 1 ? 's' : ''}
+            {open.length} task{open.length === 1 ? '' : 's'}
             {pomos > 0 && (
               <>
-                {' '}· ≈ {pomos} 🍅 · {formatDuration(load)} · fin vers {formatTime(Date.now() + load)}
+                {' '}· ≈ {pomos} 🍅 · {formatDuration(load)} · done around {formatTime(Date.now() + load)}
               </>
             )}
           </p>
@@ -95,24 +95,24 @@ export function TaskList() {
       <div className="flex flex-wrap items-center gap-2">
         <label className="flex min-w-40 flex-1 items-center gap-2 rounded-xl border border-line bg-field px-3 py-1.5">
           <Search size={15} className="text-muted" />
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Rechercher" aria-label="Rechercher une tâche" className="min-w-0 flex-1 bg-transparent text-sm outline-none" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search" aria-label="Search tasks" className="min-w-0 flex-1 bg-transparent text-sm outline-none" />
         </label>
-        <select aria-label="Trier par" value={sort} onChange={(e) => setSort(e.target.value as SortKey)} className="rounded-xl border border-line bg-field px-3 py-1.5 text-sm">
-          <option value="manual">Ordre d’ajout</option>
-          <option value="due">Échéance</option>
-          <option value="priority">Priorité</option>
-          <option value="project">Matière</option>
+        <select aria-label="Sort by" value={sort} onChange={(e) => setSort(e.target.value as SortKey)} className="rounded-xl border border-line bg-field px-3 py-1.5 text-sm">
+          <option value="manual">Date added</option>
+          <option value="due">Due date</option>
+          <option value="priority">Priority</option>
+          <option value="project">Subject</option>
         </select>
       </div>
 
       {!isDone && <QuickAdd today={today} defaults={listDefaults(list, today)} projects={projects} />}
 
       {groups.length === 0 && done.length === 0 && (
-        <p className="py-10 text-center text-sm text-muted">{q ? 'Aucun résultat.' : EMPTY[list.kind === 'project' ? 'project' : list.id]}</p>
+        <p className="py-10 text-center text-sm text-muted">{q ? 'No results.' : EMPTY[list.kind === 'project' ? 'project' : list.id]}</p>
       )}
 
       {groups.map((g) => (
-        <section key={g.key} aria-label={g.label || 'Tâches'}>
+        <section key={g.key} aria-label={g.label || 'Tasks'}>
           {g.label && <h2 className={cx('mb-1 px-3 text-xs font-semibold uppercase tracking-wider', g.late ? 'text-red-400' : 'text-muted')}>{g.label}</h2>}
           <ul>
             {g.tasks.map((t) => (
@@ -125,7 +125,7 @@ export function TaskList() {
       {done.length > 0 && (
         <details className="group" open={isDone}>
           <summary className="cursor-pointer list-none px-3 text-xs font-semibold uppercase tracking-wider text-muted">
-            <span className="inline-block transition group-open:rotate-90">›</span> Terminées ({done.length})
+            <span className="inline-block transition group-open:rotate-90">›</span> Completed ({done.length})
           </summary>
           <ul className="mt-1">
             {done.map((t) => (

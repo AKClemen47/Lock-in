@@ -3,19 +3,19 @@ import type { ListSel, SmartList } from '../../store/ui'
 import { addDays, dayKeyOf, formatDue } from '../../lib/time'
 
 export const SMART_LISTS: { id: SmartList; label: string; icon: string }[] = [
-  { id: 'today', label: 'Aujourd’hui', icon: '☀️' },
-  { id: 'tomorrow', label: 'Demain', icon: '🌤️' },
-  { id: 'week', label: '7 prochains jours', icon: '📅' },
-  { id: 'planned', label: 'Planifiées', icon: '🗓️' },
-  { id: 'overdue', label: 'En retard', icon: '⏰' },
-  { id: 'inbox', label: 'Sans matière', icon: '📥' },
-  { id: 'all', label: 'Toutes', icon: '📋' },
-  { id: 'done', label: 'Terminées', icon: '✅' },
+  { id: 'today', label: 'Today', icon: '☀️' },
+  { id: 'tomorrow', label: 'Tomorrow', icon: '🌤️' },
+  { id: 'week', label: 'Next 7 days', icon: '📅' },
+  { id: 'planned', label: 'Planned', icon: '🗓️' },
+  { id: 'overdue', label: 'Overdue', icon: '⏰' },
+  { id: 'inbox', label: 'No subject', icon: '📥' },
+  { id: 'all', label: 'All', icon: '📋' },
+  { id: 'done', label: 'Completed', icon: '✅' },
 ]
 
 export type SortKey = 'manual' | 'due' | 'priority' | 'project'
 
-/** Open tasks shown in a list (done tasks only in "Terminées"). */
+/** Open tasks shown in a list (done tasks only in "Completed"). */
 export function inList(t: Task, sel: ListSel, today: string): boolean {
   if (sel.kind === 'project') return !t.done && t.projectId === sel.id
   if (sel.id === 'done') return t.done
@@ -50,7 +50,7 @@ export function listDefaults(sel: ListSel, today: string): Partial<Task> {
 export function listTitle(sel: ListSel, projects: Project[]): string {
   if (sel.kind === 'smart') return SMART_LISTS.find((l) => l.id === sel.id)!.label
   const p = projects.find((x) => x.id === sel.id)
-  return p ? `${p.icon} ${p.name}` : 'Matière'
+  return p ? `${p.icon} ${p.name}` : 'Subject'
 }
 
 const dueKey = (t: Task) => `${t.dueDate ?? '9999'} ${t.dueTime ?? '99'}`
@@ -79,7 +79,7 @@ export function groupTasks(tasks: Task[], sel: ListSel, today: string): Group[] 
   const late = tasks.filter((t) => !t.done && t.dueDate !== null && t.dueDate < today)
   const rest = tasks.filter((t) => !late.includes(t))
   const groups: Group[] = []
-  if (late.length && !(sel.kind === 'smart' && sel.id === 'overdue')) groups.push({ key: 'late', label: 'En retard', tasks: late, late: true })
+  if (late.length && !(sel.kind === 'smart' && sel.id === 'overdue')) groups.push({ key: 'late', label: 'Overdue', tasks: late, late: true })
   else rest.unshift(...late)
   if (!byDay) {
     if (rest.length) groups.push({ key: 'main', label: '', tasks: rest })
@@ -90,7 +90,7 @@ export function groupTasks(tasks: Task[], sel: ListSel, today: string): Group[] 
     const k = t.dueDate ?? 'none'
     days.set(k, [...(days.get(k) ?? []), t])
   }
-  for (const [k, list] of days) groups.push({ key: k, label: k === 'none' ? 'Sans date' : formatDue(k, today), tasks: list })
+  for (const [k, list] of days) groups.push({ key: k, label: k === 'none' ? 'No date' : formatDue(k, today), tasks: list })
   return groups
 }
 

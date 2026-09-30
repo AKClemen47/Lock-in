@@ -11,10 +11,10 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg', 'apple-touch-icon.png'],
       manifest: {
-        name: 'Cocon — étude & focus',
+        name: 'Cocon — study & focus',
         short_name: 'Cocon',
-        description: 'Pomodoro, tâches et ambiances immersives pour étudier.',
-        lang: 'fr',
+        description: 'Pomodoro timer, tasks and immersive ambiences for studying.',
+        lang: 'en',
         start_url: '.',
         display: 'standalone',
         theme_color: '#1b1830',

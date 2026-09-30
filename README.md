@@ -23,7 +23,7 @@ npm run dev        # http://localhost:5173
 - **Tâches** : ajout rapide en langage naturel (`Réviser chap. 3 #Maths demain 18h ~2 !1`), matières colorées avec objectif hebdo, listes intelligentes (aujourd'hui, demain, 7 jours, planifiées, en retard…), sous-tâches, notes Markdown, rappels, estimation en 🍅 et heure de fin prévue.
 - **Statistiques** : jour / semaine / mois, temps par matière (barres empilées + vue tableau), Pomodoros, tâches terminées, série, calendrier de régularité.
 - **Motivation** : plante qui grandit à chaque Pomodoro, objectif quotidien, série de jours, célébration ; mode strict optionnel (une session abandonnée fait faner la plante).
-- **Ambiances** : six fonds vidéo en boucle (🌧️ Pluie, 🔥 Cheminée, 🌲 Forêt, 🌊 Mer, ☕ Café, 🌃 Soirée) liés à des sons générés en Web Audio, mixeur par couches, volumes par canal, pré-écoute, favoris, import de ta propre musique (stockée localement). Hors ligne ou en mode économie, l'image fixe remplace la vidéo.
+- **Ambiances** : huit fonds vidéo en boucle (🎋 Jardin zen, 🚆 Train au crépuscule, 🫧 Forêt sous-marine, 🔥 Cheminée, 🌲 Forêt, 🌊 Mer, ☕ Café, 🌃 Soirée) liés à des sons générés en Web Audio, mixeur par couches, volumes par canal, pré-écoute, favoris, import de ta propre musique (stockée localement). Hors ligne ou en mode économie, l'image fixe remplace la vidéo.
 - **Réglages** : thème clair / sombre / système, mode économie, notifications, raccourcis clavier, export / import JSON, réinitialisation.
 
 ## Raccourcis
@@ -49,4 +49,8 @@ src/
 
 ## Crédits vidéo
 
-Licences gratuites Pexels et Pixabay (fichiers dans `public/ambiences/`) : Phil Desforges (pluie), IslandHopper X (cheminée), Saulo Nulo (forêt), John Biondo (mer), Oleksandr Plakhota (café) sur Pexels ; Turning_Pages (soirée) sur Pixabay.
+Licences gratuites Pexels et Pixabay (fichiers dans `public/ambiences/`) : IslandHopper X (cheminée), Saulo Nulo (forêt), John Biondo (mer), Oleksandr Plakhota (café) sur Pexels ; Turning_Pages (soirée), kanenori (jardin zen) et variousphotography (train), Jackdrafahl (forêt sous-marine) sur Pixabay.
+
+## Crédits sons
+
+Enregistrements de Wikimedia Commons (fichiers dans `public/sounds/`, bouclés et normalisés) : « Campfire sound ambience » par Glaneur de sons (feu, CC BY 3.0), « Oceanwavescrushing » par Luftrum (vagues, CC BY 3.0) ; « Rain against the window » par cori (pluie), « forest ambience » par nille (forêt), « Restaurant ambience » et un enregistrement de train par stephan (café, train), dans le domaine public ; « Suikinkutsu » par Torsodog / Shizhao (bassin d'eau, CC BY-SA 3.0) ; carillon Koshi par Membeth (CC0).

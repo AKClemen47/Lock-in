@@ -49,8 +49,8 @@ export function Sidebar() {
   const archived = projects.filter((p) => p.archived)
 
   return (
-    <aside aria-label="Listes et matières" className="glass flex h-full w-64 shrink-0 flex-col gap-4 overflow-y-auto rounded-2xl p-3">
-      <section aria-label="Listes intelligentes" className="space-y-0.5">
+    <aside aria-label="Lists and subjects" className="glass flex h-full w-64 shrink-0 flex-col gap-4 overflow-y-auto rounded-2xl p-3">
+      <section aria-label="Smart lists" className="space-y-0.5">
         {SMART_LISTS.filter((l) => l.id !== 'done').map((l) => {
           const sel: ListSel = { kind: 'smart', id: l.id }
           return (
@@ -63,12 +63,12 @@ export function Sidebar() {
 
       <section aria-labelledby="projects-title" className="space-y-0.5 border-t border-line pt-3">
         <header className="flex items-center justify-between px-2.5 pb-1">
-          <h2 id="projects-title" className="text-xs font-semibold uppercase tracking-wider text-muted">Matières</h2>
-          <IconBtn label="Nouvelle matière" className="size-7" onClick={() => editProject(null)}>
+          <h2 id="projects-title" className="text-xs font-semibold uppercase tracking-wider text-muted">Subjects</h2>
+          <IconBtn label="New subject" className="size-7" onClick={() => editProject(null)}>
             <Plus size={15} />
           </IconBtn>
         </header>
-        {visible.length === 0 && <p className="px-2.5 text-xs text-muted">Crée une matière ou tape #Maths dans une tâche.</p>}
+        {visible.length === 0 && <p className="px-2.5 text-xs text-muted">Create a subject or type #Maths in a task.</p>}
         {[...visible, ...(showArchived ? archived : [])].map((p) => {
           const sel: ListSel = { kind: 'project', id: p.id }
           return (
@@ -80,7 +80,7 @@ export function Sidebar() {
                 </span>
               </Item>
               <IconBtn
-                label={`Modifier ${p.name}`}
+                label={`Edit ${p.name}`}
                 className="absolute right-7 top-0.5 size-7 bg-panel-strong opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
                 onClick={() => editProject(p)}
               >
@@ -91,14 +91,14 @@ export function Sidebar() {
         })}
         {archived.length > 0 && (
           <button type="button" className="px-2.5 pt-1 text-xs text-muted hover:text-fg" onClick={() => setShowArchived(!showArchived)}>
-            {showArchived ? 'Masquer les archivées' : `Archivées (${archived.length})`}
+            {showArchived ? 'Hide archived' : `Archived (${archived.length})`}
           </button>
         )}
       </section>
 
       <div className="mt-auto border-t border-line pt-3">
         <Item active={view === 'tasks' && same(list, { kind: 'smart', id: 'done' })} onClick={() => pick({ kind: 'smart', id: 'done' })}>
-          <span className="w-4 text-center">✅</span> Terminées
+          <span className="w-4 text-center">✅</span> Completed
         </Item>
       </div>
     </aside>
@@ -115,7 +115,7 @@ export function ListChips() {
     ...projects.map((p) => ({ sel: { kind: 'project', id: p.id } as ListSel, label: `${p.icon} ${p.name}`, color: p.color })),
   ]
   return (
-    <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1" role="tablist" aria-label="Listes">
+    <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1" role="tablist" aria-label="Lists">
       {chips.map(({ sel, label, color }) => {
         const n = sel.kind === 'smart' && sel.id === 'done' ? 0 : count(sel)
         return (
@@ -134,7 +134,7 @@ export function ListChips() {
         )
       })}
       <button type="button" onClick={() => editProject(null)} className="shrink-0 rounded-full border border-dashed border-line px-3 py-1.5 text-xs">
-        + Matière
+        + Subject
       </button>
     </div>
   )

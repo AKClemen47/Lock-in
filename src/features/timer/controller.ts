@@ -9,7 +9,7 @@ import { playChime } from '../../audio/chimes'
 import { playAmbience, setDuck, stopAmbience } from '../../audio/ambience'
 import { mixFor } from '../../audio/soundThemes'
 
-export const PHASE_LABEL: Record<Phase, string> = { focus: 'Focus', short: 'Pause courte', long: 'Pause longue' }
+export const PHASE_LABEL: Record<Phase, string> = { focus: 'Focus', short: 'Short break', long: 'Long break' }
 
 const settings = () => useSettings.getState()
 const ui = () => useUi.getState()
@@ -105,7 +105,7 @@ function afterAdvance(next: TimerState) {
   const s = settings()
   const auto = next.phase === 'focus' ? s.autoStartFocus : s.autoStartBreaks
   if (auto) startTimer()
-  announce(`${PHASE_LABEL[next.phase]} ${auto ? 'démarrée' : 'prête'}.`)
+  announce(`${PHASE_LABEL[next.phase]} ${auto ? 'started' : 'ready'}.`)
 }
 
 /** Focus time below one minute is not worth a history entry. */
@@ -139,10 +139,10 @@ export async function completePhase(at: number) {
         taskId: t.taskId,
       })
       ui().set({ plant: 'grown', celebrateAt: s.celebrate ? Date.now() : 0 })
-      notify('Session terminée 🌱', `Bravo ! Place à une ${next.phase === 'long' ? 'pause longue' : 'pause courte'}.`)
-      ui().toast('Session terminée, ta plante a poussé 🌱')
+      notify('Session complete 🌱', `Well done! Time for a ${next.phase === 'long' ? 'long' : 'short'} break.`)
+      ui().toast('Session complete, your plant has grown 🌱')
     } else {
-      notify('Pause terminée', 'Prêt·e pour une nouvelle session ?')
+      notify('Break over', 'Ready for a new session?')
     }
     afterAdvance(next)
   } finally {

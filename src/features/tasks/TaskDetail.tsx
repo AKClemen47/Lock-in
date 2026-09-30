@@ -69,7 +69,7 @@ function Body({ task }: { task: Task }) {
   const remove = async () => {
     useUi.getState().set({ openTaskId: null })
     await deleteTask(task.id)
-    toast(`« ${task.title} » supprimée`, { label: 'Annuler', run: () => void addTask(task) })
+    toast(`"${task.title}" deleted`, { label: 'Undo', run: () => void addTask(task) })
   }
   const setReminder = (ts: number | null) => set({ reminderAt: ts, reminded: false })
 
@@ -81,48 +81,48 @@ function Body({ task }: { task: Task }) {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           onBlur={() => title.trim() && set({ title: title.trim() })}
-          aria-label="Titre"
+          aria-label="Title"
           className={cx(inputClass, 'text-base font-medium', task.done && 'line-through')}
         />
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <Field label="Matière">
+        <Field label="Subject">
           <select className={inputClass} value={task.projectId ?? ''} onChange={(e) => set({ projectId: e.target.value || null })}>
-            <option value="">Sans matière</option>
+            <option value="">No subject</option>
             {projects.map((p) => (
               <option key={p.id} value={p.id}>{`${p.icon} ${p.name}`}</option>
             ))}
           </select>
         </Field>
-        <Field label="Pomodoros (réalisés / estimés)">
+        <Field label="Pomodoros (done / estimated)">
           <div className="flex items-center gap-2">
             <span className="text-sm tabular-nums">🍅 {task.spent} /</span>
-            <IconBtn label="Moins" variant="soft" className="size-8" onClick={() => set({ estimate: Math.max(0, task.estimate - 1) })}>
+            <IconBtn label="Fewer" variant="soft" className="size-8" onClick={() => set({ estimate: Math.max(0, task.estimate - 1) })}>
               <Minus size={14} />
             </IconBtn>
             <span className="w-5 text-center text-sm tabular-nums">{task.estimate}</span>
-            <IconBtn label="Plus" variant="soft" className="size-8" onClick={() => set({ estimate: task.estimate + 1 })}>
+            <IconBtn label="More" variant="soft" className="size-8" onClick={() => set({ estimate: task.estimate + 1 })}>
               <Plus size={14} />
             </IconBtn>
           </div>
         </Field>
-        <Field label="Échéance">
+        <Field label="Due date">
           <input type="date" className={inputClass} value={task.dueDate ?? ''} onChange={(e) => set({ dueDate: e.target.value || null })} />
         </Field>
-        <Field label="Heure">
+        <Field label="Time">
           <input type="time" className={inputClass} value={task.dueTime ?? ''} onChange={(e) => set({ dueTime: e.target.value || null })} disabled={!task.dueDate} />
         </Field>
       </div>
 
       <div className="text-xs text-muted" aria-live="polite">
-        {task.estimate > task.spent && `Reste ≈ ${formatDuration(workloadMs(task.estimate - task.spent, durations))} (pauses comprises)`}
+        {task.estimate > task.spent && `About ${formatDuration(workloadMs(task.estimate - task.spent, durations))} left (breaks included)`}
       </div>
 
       <div>
-        <span className="mb-1 block text-xs text-muted">Priorité</span>
+        <span className="mb-1 block text-xs text-muted">Priority</span>
         <Segmented<Priority>
-          label="Priorité"
+          label="Priority"
           size="sm"
           value={task.priority}
           onChange={(priority) => set({ priority })}
@@ -131,24 +131,24 @@ function Body({ task }: { task: Task }) {
       </div>
 
       <div>
-        <span className="mb-1 block text-xs text-muted">Rappel</span>
+        <span className="mb-1 block text-xs text-muted">Reminder</span>
         <div className="flex flex-wrap items-center gap-2">
           <input
             type="datetime-local"
-            aria-label="Date et heure du rappel"
+            aria-label="Reminder date and time"
             className={cx(inputClass, 'w-auto')}
             value={task.reminderAt ? toLocalInput(task.reminderAt) : ''}
             onChange={(e) => setReminder(e.target.value ? new Date(e.target.value).getTime() : null)}
           />
           {due && (
             <>
-              <Btn className="px-2 py-1 text-xs" onClick={() => setReminder(due)}>À l’échéance</Btn>
-              <Btn className="px-2 py-1 text-xs" onClick={() => setReminder(due - 3_600_000)}>1 h avant</Btn>
-              <Btn className="px-2 py-1 text-xs" onClick={() => setReminder(due - 86_400_000)}>La veille</Btn>
+              <Btn className="px-2 py-1 text-xs" onClick={() => setReminder(due)}>When due</Btn>
+              <Btn className="px-2 py-1 text-xs" onClick={() => setReminder(due - 3_600_000)}>1h before</Btn>
+              <Btn className="px-2 py-1 text-xs" onClick={() => setReminder(due - 86_400_000)}>The day before</Btn>
             </>
           )}
           {task.reminderAt && (
-            <IconBtn label="Retirer le rappel" onClick={() => setReminder(null)}>
+            <IconBtn label="Remove reminder" onClick={() => setReminder(null)}>
               <X size={14} />
             </IconBtn>
           )}
@@ -156,7 +156,7 @@ function Body({ task }: { task: Task }) {
       </div>
 
       <div>
-        <span className="mb-1 block text-xs text-muted">Sous-tâches</span>
+        <span className="mb-1 block text-xs text-muted">Subtasks</span>
         <ul className="space-y-1">
           {task.subtasks.map((s) => (
             <li key={s.id} className="group flex items-center gap-2 text-sm">
@@ -167,7 +167,7 @@ function Body({ task }: { task: Task }) {
                 onChange={() => set({ subtasks: task.subtasks.map((x) => (x.id === s.id ? { ...x, done: !x.done } : x)) })}
               />
               <span className={cx('flex-1', s.done && 'text-muted line-through')}>{s.title}</span>
-              <IconBtn label={`Supprimer « ${s.title} »`} className="size-7 opacity-0 group-hover:opacity-100 focus-visible:opacity-100" onClick={() => set({ subtasks: task.subtasks.filter((x) => x.id !== s.id) })}>
+              <IconBtn label={`Delete "${s.title}"`} className="size-7 opacity-0 group-hover:opacity-100 focus-visible:opacity-100" onClick={() => set({ subtasks: task.subtasks.filter((x) => x.id !== s.id) })}>
                 <X size={12} />
               </IconBtn>
             </li>
@@ -178,8 +178,8 @@ function Body({ task }: { task: Task }) {
           onChange={(e) => setSub(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && addSub()}
           onBlur={addSub}
-          placeholder="+ Ajouter une sous-tâche"
-          aria-label="Nouvelle sous-tâche"
+          placeholder="+ Add a subtask"
+          aria-label="New subtask"
           className="mt-1 w-full bg-transparent py-1 text-sm outline-none placeholder:text-muted"
         />
       </div>
@@ -188,14 +188,14 @@ function Body({ task }: { task: Task }) {
         <div className="mb-1 flex items-center justify-between">
           <span className="text-xs text-muted">Notes (Markdown)</span>
           <Btn variant="ghost" className="px-2 py-0.5 text-xs" onClick={() => setPreview(!preview)}>
-            {preview ? 'Modifier' : 'Aperçu'}
+            {preview ? 'Edit' : 'Preview'}
           </Btn>
         </div>
         {preview ? (
           <div
             className="notes min-h-20 cursor-text rounded-xl bg-field p-3 text-sm"
             onClick={() => setPreview(false)}
-            dangerouslySetInnerHTML={{ __html: renderMarkdown(notes) || '<p class="text-muted">Aucune note.</p>' }}
+            dangerouslySetInnerHTML={{ __html: renderMarkdown(notes) || '<p class="text-muted">No notes.</p>' }}
           />
         ) : (
           <textarea
@@ -204,7 +204,7 @@ function Body({ task }: { task: Task }) {
             onBlur={() => set({ notes })}
             rows={5}
             aria-label="Notes"
-            placeholder="Liens de cours, formules, idées… **gras**, *italique*, - listes"
+            placeholder="Course links, formulas, ideas… **bold**, *italic*, - lists"
             className={cx(inputClass, 'resize-y font-mono text-xs')}
           />
         )}
@@ -213,12 +213,12 @@ function Body({ task }: { task: Task }) {
       <footer className="flex flex-wrap items-center gap-2 border-t border-line pt-4">
         {!task.done && (
           <Btn variant="primary" onClick={() => (useUi.getState().set({ openTaskId: null }), startTask(task.id))}>
-            <Play size={16} /> Lancer un Pomodoro
+            <Play size={16} /> Start a Pomodoro
           </Btn>
         )}
-        <Btn onClick={() => completeTask(task)}>{task.done ? 'Rouvrir' : 'Terminer'}</Btn>
+        <Btn onClick={() => completeTask(task)}>{task.done ? 'Reopen' : 'Complete'}</Btn>
         <Btn variant="danger" className="ml-auto" onClick={() => void remove()}>
-          <Trash2 size={16} /> Supprimer
+          <Trash2 size={16} /> Delete
         </Btn>
       </footer>
     </div>
@@ -230,7 +230,7 @@ export function TaskDetail() {
   const task = useLiveQuery(() => (id ? db.tasks.get(id) : undefined), [id])
   const close = () => useUi.getState().set({ openTaskId: null })
   return (
-    <Modal open={Boolean(id && task)} onClose={close} title="Tâche" wide>
+    <Modal open={Boolean(id && task)} onClose={close} title="Task" wide>
       {task && <Body key={task.id} task={task} />}
     </Modal>
   )

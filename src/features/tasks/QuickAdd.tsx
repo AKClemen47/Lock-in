@@ -6,7 +6,7 @@ import { quickAddTask } from '../../lib/repo'
 import { formatDue } from '../../lib/time'
 import { cx } from '../../components/ui'
 
-const HELP = '#matière  !1 à !4 priorité  ~3 pomodoros  demain / lundi / 12/10  18h30'
+const HELP = '#subject  !1 to !4 priority  ~3 pomodoros  tomorrow / monday / 12/10  6:30pm'
 
 function Chip({ children, color }: { children: ReactNode; color?: string }) {
   return (
@@ -37,8 +37,8 @@ export function QuickAdd({ today, defaults, projects }: { today: string; default
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && void submit()}
-          placeholder="Ajouter une tâche… ex. Réviser chap. 3 #Maths demain 18h ~2"
-          aria-label="Ajouter une tâche"
+          placeholder="Add a task… e.g. Revise ch. 3 #Maths tomorrow 6pm ~2"
+          aria-label="Add a task"
           aria-describedby="quickadd-help"
           data-quickadd
           className="min-w-0 flex-1 bg-transparent py-1.5 text-sm outline-none placeholder:text-muted"
@@ -49,12 +49,12 @@ export function QuickAdd({ today, defaults, projects }: { today: string; default
           <>
             {p.projectName && (
               <Chip color={matched?.color}>
-                {matched ? `${matched.icon} ${matched.name}` : `＋ nouvelle matière « ${p.projectName} »`}
+                {matched ? `${matched.icon} ${matched.name}` : `＋ new subject "${p.projectName}"`}
               </Chip>
             )}
             {p.priority && <Chip color={PRIORITIES[p.priority].color}>⚑ {PRIORITIES[p.priority].label}</Chip>}
             {p.dueDate && <Chip>📅 {formatDue(p.dueDate, today)}</Chip>}
-            {p.dueTime && <Chip>🕒 {p.dueTime.replace(':', ' h ')}</Chip>}
+            {p.dueTime && <Chip>🕒 {p.dueTime}</Chip>}
             {p.estimate && <Chip>🍅 × {p.estimate}</Chip>}
           </>
         ) : (

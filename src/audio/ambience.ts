@@ -1,5 +1,6 @@
 import { audio, buses } from './engine'
 import { LAYERS, type LayerKind } from './layers'
+import { THEME_GAIN } from './soundThemes'
 import type { ThemeId } from '../store/settings'
 
 interface Running {
@@ -59,7 +60,7 @@ export function playAmbience(theme: ThemeId, mix: Record<string, number>, fade =
   }
   for (const [id, v] of Object.entries(mix)) setLayer(current, id, v)
   current.gain.gain.cancelScheduledValues(ctx.currentTime)
-  current.gain.gain.setTargetAtTime(1, ctx.currentTime, fade / 4)
+  current.gain.gain.setTargetAtTime(THEME_GAIN[theme], ctx.currentTime, fade / 4)
 }
 
 export function stopAmbience(fade = 1.5) {

@@ -18,7 +18,7 @@ export async function addProject(p: Partial<Project> & { name: string }): Promis
 
 export const updateProject = (id: string, patch: Partial<Project>) => db.projects.update(id, patch)
 
-/** Delete a project; its tasks move to "Sans matière", sessions keep their history. */
+/** Delete a project; its tasks move to "No subject", sessions keep their history. */
 export function deleteProject(id: string) {
   return db.transaction('rw', db.projects, db.tasks, async () => {
     await db.tasks.where('projectId').equals(id).modify({ projectId: null })
@@ -50,7 +50,7 @@ export async function addTask(t: Partial<Task> & { title: string }): Promise<Tas
   return task
 }
 
-/** Create a task from the quick-add syntax; unknown `#matière` creates the project. */
+/** Create a task from the quick-add syntax; unknown `#subject` creates the project. */
 export async function quickAddTask(input: string, today: string, defaults: Partial<Task>): Promise<Task | null> {
   const parsed = parseQuickAdd(input, today)
   if (!parsed.title) return null
@@ -103,7 +103,7 @@ export async function exportAll(settings: unknown): Promise<Backup> {
 export async function importAll(data: unknown): Promise<Backup> {
   const b = data as Backup
   if (!b || b.app !== 'cocon' || !Array.isArray(b.projects) || !Array.isArray(b.tasks) || !Array.isArray(b.sessions))
-    throw new Error("Ce fichier n'est pas une sauvegarde Cocon.")
+    throw new Error('This file is not a Cocon backup.')
   await db.transaction('rw', db.projects, db.tasks, db.sessions, async () => {
     await Promise.all([db.projects.clear(), db.tasks.clear(), db.sessions.clear()])
     await Promise.all([db.projects.bulkAdd(b.projects), db.tasks.bulkAdd(b.tasks), db.sessions.bulkAdd(b.sessions)])

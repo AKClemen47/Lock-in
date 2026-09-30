@@ -53,7 +53,7 @@ export function Slider({ label, value, onChange, min = 0, max = 1, step = 0.01, 
     <label className={cx('block', disabled && 'opacity-50')}>
       <span className="flex justify-between text-sm">
         <span>{label}</span>
-        <span className="text-muted tabular-nums">{format ? format(value) : `${Math.round(value * 100)} %`}</span>
+        <span className="text-muted tabular-nums">{format ? format(value) : `${Math.round(value * 100)}%`}</span>
       </span>
       <input
         type="range"
@@ -155,7 +155,7 @@ export function Modal({ open, onClose, title, children, wide }: { open: boolean;
         <div className="p-5">
           <header className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold">{title}</h2>
-            <IconBtn label="Fermer" onClick={onClose}>
+            <IconBtn label="Close" onClick={onClose}>
               <X size={18} />
             </IconBtn>
           </header>

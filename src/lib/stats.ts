@@ -61,7 +61,7 @@ export function bucketize(sessions: SessionLike[], period: Period, anchor: strin
     : Array.from({ length: days }, (_, i) => {
         const k = addDays(from, i)
         return period === 'week'
-          ? new Intl.DateTimeFormat('fr-FR', { weekday: 'short' }).format(new Date(k + 'T12:00'))
+          ? new Intl.DateTimeFormat('en-GB', { weekday: 'short' }).format(new Date(k + 'T12:00'))
           : String(Number(k.slice(8)))
       })
   const index = new Map(Array.from({ length: days }, (_, i) => [addDays(from, i), i]))

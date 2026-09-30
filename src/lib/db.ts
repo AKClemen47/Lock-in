@@ -80,8 +80,8 @@ export const PROJECT_COLORS = ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55
 export const PROJECT_ICONS = ['📘', '📐', '⚖️', '🏛️', '🧪', '🌍', '💻', '🎨', '🎵', '🗣️', '🧠', '📝']
 
 export const PRIORITIES: Record<Priority, { label: string; color: string }> = {
-  1: { label: 'Urgente', color: '#f87171' },
-  2: { label: 'Haute', color: '#fb923c' },
-  3: { label: 'Normale', color: '#60a5fa' },
-  4: { label: 'Aucune', color: '#8a8799' },
+  1: { label: 'Urgent', color: '#f87171' },
+  2: { label: 'High', color: '#fb923c' },
+  3: { label: 'Normal', color: '#60a5fa' },
+  4: { label: 'None', color: '#8a8799' },
 }

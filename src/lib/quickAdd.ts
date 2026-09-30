@@ -15,15 +15,23 @@ export interface ParsedTask {
 export const normalize = (s: string) =>
   s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/’/g, "'").toLowerCase().trim()
 
-const WEEKDAYS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi']
+const WEEKDAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
+
+/** `6pm`, `6:30pm`, `18:30`, `18h`, `18h30` → `HH:MM`. */
+function parseTime(word: string): string | null {
+  const pad = (h: number) => String(h).padStart(2, '0')
+  let m = word.match(/^(1[0-2]|0?[1-9])(?::([0-5]\d))?(am|pm)$/)
+  if (m) return `${pad((Number(m[1]) % 12) + (m[3] === 'pm' ? 12 : 0))}:${m[2] ?? '00'}`
+  m = word.match(/^([01]?\d|2[0-3])(?:h([0-5]\d)?|:([0-5]\d))$/)
+  return m ? `${pad(Number(m[1]))}:${m[2] ?? m[3] ?? '00'}` : null
+}
 
 function parseDateWord(word: string, today: string): string | null {
-  if (word === "aujourd'hui" || word === 'auj') return today
-  if (word === 'demain') return addDays(today, 1)
-  if (word === 'apres-demain') return addDays(today, 2)
+  if (word === 'today') return today
+  if (word === 'tomorrow' || word === 'tmrw') return addDays(today, 1)
   const wd = WEEKDAYS.indexOf(word)
   if (wd >= 0) {
-    // Next occurrence strictly after today: typing "lundi" on a Monday means next week.
+    // Next occurrence strictly after today: typing "monday" on a Monday means next week.
     const diff = (wd - fromKey(today).getDay() + 7) % 7 || 7
     return addDays(today, diff)
   }
@@ -40,9 +48,9 @@ function parseDateWord(word: string, today: string): string | null {
 }
 
 /**
- * Quick-add syntax: `Réviser ch.3 #Maths !1 demain 18h ~3`
- * `#matière` (underscores = spaces), `!1`–`!4` priority, a date word or jj/mm[/aaaa],
- * `18h` / `18h30` time, `~3` estimated pomodoros. Everything else is the title.
+ * Quick-add syntax: `Revise ch.3 #Maths !1 tomorrow 6pm ~3`
+ * `#subject` (underscores = spaces), `!1`–`!4` priority, a date word or dd/mm[/yyyy],
+ * `6pm` / `6:30pm` / `18:30` time, `~3` estimated pomodoros. Everything else is the title.
  */
 export function parseQuickAdd(input: string, today: string): ParsedTask {
   const out: ParsedTask = { title: '', projectName: null, priority: null, dueDate: null, dueTime: null, estimate: null }
@@ -53,11 +61,11 @@ export function parseQuickAdd(input: string, today: string): ParsedTask {
     if ((m = token.match(/^#([\p{L}\p{N}_\-.]+)$/u))) out.projectName = m[1].replace(/_/g, ' ')
     else if ((m = word.match(/^!([1-4])$/))) out.priority = Number(m[1]) as Priority
     else if ((m = word.match(/^~(\d{1,2})$/))) out.estimate = Number(m[1])
-    else if ((m = word.match(/^([01]?\d|2[0-3])h([0-5]\d)?$/)))
-      out.dueTime = `${m[1].padStart(2, '0')}:${m[2] ?? '00'}`
     else {
-      const date = parseDateWord(word, today)
-      if (date) out.dueDate = date
+      const time = parseTime(word)
+      const date = time ? null : parseDateWord(word, today)
+      if (time) out.dueTime = time
+      else if (date) out.dueDate = date
       else rest.push(token)
     }
   }
@@ -66,7 +74,7 @@ export function parseQuickAdd(input: string, today: string): ParsedTask {
   return out
 }
 
-/** Find a project by name: exact match first, then prefix, singular included (`#maths` → « Mathématiques »). */
+/** Find a project by name: exact match first, then prefix, singular included (`#maths` → "Mathematics"). */
 export function matchProject<T extends { name: string; archived?: boolean }>(name: string, projects: T[]): T | null {
   const n = normalize(name)
   const stem = n.length > 3 ? n.replace(/s$/, '') : n

@@ -22,7 +22,7 @@ export function Toasts() {
               {t.action.label}
             </button>
           )}
-          <button type="button" aria-label="Fermer" className="rounded-full p-1 text-muted hover:bg-hover" onClick={() => dismiss(t.id)}>
+          <button type="button" aria-label="Close" className="rounded-full p-1 text-muted hover:bg-hover" onClick={() => dismiss(t.id)}>
             <X size={14} />
           </button>
         </div>

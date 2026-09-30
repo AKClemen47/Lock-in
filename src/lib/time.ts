@@ -65,13 +65,13 @@ export function shiftPeriod(period: Period, anchor: string, dir: number): string
   return toKey(new Date(d.getFullYear(), d.getMonth() + dir, 1))
 }
 
-/** 3 h 05 · 45 min · 0 min */
+/** 3h 05 · 45 min · 0 min */
 export function formatDuration(ms: number): string {
   const total = Math.round(Math.max(0, ms) / MIN)
   const h = Math.floor(total / 60)
   const m = total % 60
   if (h === 0) return `${m} min`
-  return m === 0 ? `${h} h` : `${h} h ${pad(m)}`
+  return m === 0 ? `${h}h` : `${h}h ${pad(m)}`
 }
 
 /** Countdown display, rounded up so it never shows 00:00 while time remains. */
@@ -84,11 +84,11 @@ export function formatClock(ms: number): string {
 
 export const formatTime = (ts: number) => {
   const d = new Date(ts)
-  return `${d.getHours()} h ${pad(d.getMinutes())}`
+  return `${d.getHours()}:${pad(d.getMinutes())}`
 }
 
-const dayFmt = new Intl.DateTimeFormat('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' })
-const monthFmt = new Intl.DateTimeFormat('fr-FR', { month: 'long', year: 'numeric' })
+const dayFmt = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
+const monthFmt = new Intl.DateTimeFormat('en-GB', { month: 'long', year: 'numeric' })
 
 export const formatDay = (key: string) => dayFmt.format(fromKey(key))
 
@@ -102,8 +102,8 @@ export function formatPeriod(period: Period, anchor: string): string {
 /** Relative due-date label used on task rows. */
 export function formatDue(key: string, today: string): string {
   const diff = daysBetween(today, key)
-  if (diff === 0) return "Aujourd'hui"
-  if (diff === 1) return 'Demain'
-  if (diff === -1) return 'Hier'
+  if (diff === 0) return 'Today'
+  if (diff === 1) return 'Tomorrow'
+  if (diff === -1) return 'Yesterday'
   return formatDay(key)
 }

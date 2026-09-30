@@ -57,7 +57,7 @@ export function FocusMode() {
             </div>
             <div className="text-base opacity-80">
               {PHASE_LABEL[t.phase]}
-              {t.status === 'paused' && ' · en pause'}
+              {t.status === 'paused' && ' · paused'}
             </div>
             {showTaskInFocus && task && <div className="mx-auto max-w-64 truncate text-sm opacity-70">{task.title}</div>}
           </div>
@@ -73,19 +73,19 @@ export function FocusMode() {
           hide ? 'pointer-events-none opacity-0' : 'opacity-100',
         )}
       >
-        <IconBtn label={running ? 'Pause (Espace)' : 'Démarrer (Espace)'} className="size-12 text-white hover:bg-white/15" onClick={toggleTimer}>
+        <IconBtn label={running ? 'Pause (Space)' : 'Start (Space)'} className="size-12 text-white hover:bg-white/15" onClick={toggleTimer}>
           {running ? <Pause size={22} /> : <Play size={22} />}
         </IconBtn>
-        <IconBtn label="Passer (S)" className="text-white hover:bg-white/15" onClick={() => void skipPhase()}>
+        <IconBtn label="Skip (S)" className="text-white hover:bg-white/15" onClick={() => void skipPhase()}>
           <SkipForward size={18} />
         </IconBtn>
-        <IconBtn label={ambiencePlaying ? 'Couper l’ambiance' : 'Lancer l’ambiance'} className={cx('text-white hover:bg-white/15', !ambiencePlaying && 'opacity-60')} onClick={toggleAmbience}>
+        <IconBtn label={ambiencePlaying ? 'Stop the ambience' : 'Play the ambience'} className={cx('text-white hover:bg-white/15', !ambiencePlaying && 'opacity-60')} onClick={toggleAmbience}>
           <Music size={18} />
         </IconBtn>
-        <IconBtn label={muted ? 'Réactiver le son (M)' : 'Muet (M)'} className="text-white hover:bg-white/15" onClick={toggleMute}>
+        <IconBtn label={muted ? 'Unmute (M)' : 'Mute (M)'} className="text-white hover:bg-white/15" onClick={toggleMute}>
           {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
         </IconBtn>
-        <IconBtn label="Quitter le mode focus (Échap)" className="text-white hover:bg-white/15" onClick={exitFocusMode}>
+        <IconBtn label="Exit focus mode (Esc)" className="text-white hover:bg-white/15" onClick={exitFocusMode}>
           <Minimize2 size={18} />
         </IconBtn>
       </div>

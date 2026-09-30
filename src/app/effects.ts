@@ -10,7 +10,7 @@ import { playChime } from '../audio/chimes'
 import { useSettings } from '../store/settings'
 import { toast, useUi } from '../store/ui'
 import { useTimer } from '../store/timer'
-import { exitFocusMode, skipPhase, toggleFocusMode, toggleMute, toggleTimer } from '../features/timer/controller'
+import { exitFocusMode, skipPhase, startAmbience, toggleFocusMode, toggleMute, toggleTimer } from '../features/timer/controller'
 import { useMediaQuery } from '../lib/hooks'
 
 /** Settings and UI state → audio graph (levels, theme/mix changes, music). */
@@ -26,6 +26,24 @@ export function useAudioSync() {
   useEffect(() => {
     if (s.linkSound && s.soundTheme !== s.visualTheme) s.set({ soundTheme: s.visualTheme })
   }, [s.linkSound, s.visualTheme, s.soundTheme, s])
+
+  // Browsers forbid sound before a gesture: the ambience starts with the first click or key press.
+  // Deferred so a click on ♫ or "Start" (which start it themselves) isn't toggled back.
+  useEffect(() => {
+    const off = () => {
+      window.removeEventListener('click', first, true)
+      window.removeEventListener('keydown', first, true)
+    }
+    const first = () => {
+      off()
+      setTimeout(() => {
+        if (useSettings.getState().autoAmbience && !useUi.getState().ambiencePlaying) startAmbience()
+      }, 0)
+    }
+    window.addEventListener('click', first, true)
+    window.addEventListener('keydown', first, true)
+    return off
+  }, [])
 
   // Theme switch → crossfade; mix tweak → per-layer volume.
   useEffect(() => {
@@ -67,7 +85,7 @@ export function useShortcuts() {
           break
         case 'm':
           toggleMute()
-          toast(useSettings.getState().muted ? 'Son coupé' : 'Son rétabli')
+          toast(useSettings.getState().muted ? 'Sound off' : 'Sound on')
           break
         case 'f':
           toggleFocusMode()
@@ -119,10 +137,10 @@ export function useReminders() {
       const due = await db.tasks.filter((t) => !t.done && !t.reminded && t.reminderAt !== null && t.reminderAt <= now).toArray()
       for (const t of due) {
         await db.tasks.update(t.id, { reminded: true })
-        const body = t.dueTime ? `Échéance à ${t.dueTime.replace(':', ' h ')}` : 'Rappel de tâche'
+        const body = t.dueTime ? `Due at ${t.dueTime}` : 'Task reminder'
         notify(`⏰ ${t.title}`, body)
         playChime('breakEnd', useSettings.getState().chime)
-        toast(`⏰ ${t.title}`, { label: 'Ouvrir', run: () => useUi.getState().set({ view: 'tasks', openTaskId: t.id }) })
+        toast(`⏰ ${t.title}`, { label: 'Open', run: () => useUi.getState().set({ view: 'tasks', openTaskId: t.id }) })
       }
     }
     void check()
@@ -160,8 +178,8 @@ export function useBackupReminder() {
     void db.sessions.count().then((n) => {
       if (n < 20) return
       if (lastBackupAt && Date.now() - lastBackupAt < 30 * 86_400_000) return
-      toast('Pense à sauvegarder tes données', {
-        label: 'Réglages',
+      toast('Remember to back up your data', {
+        label: 'Settings',
         run: () => useUi.getState().set({ view: 'settings' }),
       })
       if (!lastBackupAt) set({ lastBackupAt: Date.now() - 23 * 86_400_000 }) // ask again in a week

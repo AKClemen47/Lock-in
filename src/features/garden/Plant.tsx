@@ -16,10 +16,10 @@ export function Plant({ progress, outcome, size = 96 }: { progress: number; outc
   const dark = wilted ? '#7d6a45' : '#45a86a'
   const bend = wilted ? 18 : 0
   const label = wilted
-    ? 'Plante fanée : session abandonnée'
+    ? 'Wilted plant: session abandoned'
     : outcome === 'grown'
-      ? 'Plante en fleur : session réussie'
-      : `Plante en croissance, ${Math.round(p * 100)} %`
+      ? 'Plant in bloom: session completed'
+      : `Growing plant, ${Math.round(p * 100)}%`
 
   return (
     <svg viewBox="0 0 100 130" width={size} height={size * 1.3} role="img" aria-label={label}>

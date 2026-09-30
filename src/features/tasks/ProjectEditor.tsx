@@ -40,12 +40,12 @@ export function ProjectEditor({ project, onClose }: { project: Project | null | 
     await deleteProject(project.id)
     const ui = useUi.getState()
     if (ui.list.kind === 'project' && ui.list.id === project.id) ui.set({ list: { kind: 'smart', id: 'today' } })
-    toast(`Matière « ${project.name} » supprimée — ses tâches sont dans « Sans matière »`)
+    toast(`Subject "${project.name}" deleted — its tasks are now in "No subject"`)
     onClose()
   }
 
   return (
-    <Modal open={project !== undefined} onClose={onClose} title={project ? 'Modifier la matière' : 'Nouvelle matière'}>
+    <Modal open={project !== undefined} onClose={onClose} title={project ? 'Edit subject' : 'New subject'}>
       <form
         className="space-y-4"
         onSubmit={(e) => {
@@ -54,17 +54,17 @@ export function ProjectEditor({ project, onClose }: { project: Project | null | 
         }}
       >
         <label className="block">
-          <span className="mb-1 block text-xs text-muted">Nom</span>
-          <input autoFocus className={inputClass} value={name} onChange={(e) => setName(e.target.value)} placeholder="ex. Mathématiques" />
+          <span className="mb-1 block text-xs text-muted">Name</span>
+          <input autoFocus className={inputClass} value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Mathematics" />
         </label>
         <fieldset>
-          <legend className="mb-1 text-xs text-muted">Couleur</legend>
+          <legend className="mb-1 text-xs text-muted">Colour</legend>
           <div className="flex flex-wrap gap-2">
             {PROJECT_COLORS.map((c) => (
               <button
                 key={c}
                 type="button"
-                aria-label={`Couleur ${c}`}
+                aria-label={`Colour ${c}`}
                 aria-pressed={c === color}
                 onClick={() => setColor(c)}
                 className={cx('size-8 rounded-full transition', c === color ? 'ring-2 ring-fg ring-offset-2 ring-offset-panel-strong' : 'hover:scale-110')}
@@ -74,13 +74,13 @@ export function ProjectEditor({ project, onClose }: { project: Project | null | 
           </div>
         </fieldset>
         <fieldset>
-          <legend className="mb-1 text-xs text-muted">Icône</legend>
+          <legend className="mb-1 text-xs text-muted">Icon</legend>
           <div className="flex flex-wrap gap-1">
             {PROJECT_ICONS.map((i) => (
               <button
                 key={i}
                 type="button"
-                aria-label={`Icône ${i}`}
+                aria-label={`Icon ${i}`}
                 aria-pressed={i === icon}
                 onClick={() => setIcon(i)}
                 className={cx('grid size-9 place-items-center rounded-lg text-lg transition', i === icon ? 'bg-line' : 'hover:bg-hover')}
@@ -91,19 +91,19 @@ export function ProjectEditor({ project, onClose }: { project: Project | null | 
           </div>
         </fieldset>
         <label className="block">
-          <span className="mb-1 block text-xs text-muted">Objectif hebdomadaire (heures, facultatif)</span>
+          <span className="mb-1 block text-xs text-muted">Weekly goal (hours, optional)</span>
           <input type="number" min={0} step={0.5} className={inputClass} value={goal} onChange={(e) => setGoal(e.target.value)} />
         </label>
-        {project && <Toggle label="Archiver" hint="Masquée des listes, historique conservé" checked={archived} onChange={setArchived} />}
+        {project && <Toggle label="Archive" hint="Hidden from lists, history kept" checked={archived} onChange={setArchived} />}
         <footer className="flex items-center gap-2 pt-2">
           {project && (
             <Btn variant="danger" onClick={() => void remove()}>
-              {armed ? 'Confirmer la suppression' : 'Supprimer'}
+              {armed ? 'Confirm deletion' : 'Delete'}
             </Btn>
           )}
-          <Btn variant="ghost" className="ml-auto" onClick={onClose}>Annuler</Btn>
+          <Btn variant="ghost" className="ml-auto" onClick={onClose}>Cancel</Btn>
           <button type="submit" disabled={!name.trim()} className="rounded-xl bg-accent px-3.5 py-2 text-sm font-semibold text-on-accent disabled:opacity-40">
-            Enregistrer
+            Save
           </button>
         </footer>
       </form>

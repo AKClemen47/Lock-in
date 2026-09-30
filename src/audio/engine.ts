@@ -31,7 +31,15 @@ export function audio(): AudioContext {
     ambienceBus = bus()
     musicBus = bus()
     notifBus = bus()
-    master.connect(ctx.destination)
+    // Brick-wall limiter: louder ambiences and stacked sounds never clip.
+    const limiter = ctx.createDynamicsCompressor()
+    limiter.threshold.value = -3
+    limiter.knee.value = 0
+    limiter.ratio.value = 20
+    limiter.attack.value = 0.003
+    limiter.release.value = 0.25
+    master.connect(limiter)
+    limiter.connect(ctx.destination)
     for (const b of [ambienceBus, musicBus, notifBus]) b.connect(master)
     setLevels(levels)
   }

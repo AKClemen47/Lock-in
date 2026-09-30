@@ -10,10 +10,10 @@ import { TimerRing } from '../features/timer/TimerPanel'
 import { cx } from './ui'
 
 const NAV: { view: View; label: string; icon: typeof Timer }[] = [
-  { view: 'tasks', label: 'Minuteur et tâches', icon: Timer },
-  { view: 'stats', label: 'Statistiques', icon: BarChart3 },
-  { view: 'ambience', label: 'Ambiances', icon: Waves },
-  { view: 'settings', label: 'Réglages', icon: Settings },
+  { view: 'tasks', label: 'Timer and tasks', icon: Timer },
+  { view: 'stats', label: 'Statistics', icon: BarChart3 },
+  { view: 'ambience', label: 'Ambiences', icon: Waves },
+  { view: 'settings', label: 'Settings', icon: Settings },
 ]
 
 function RailBtn({ label, active, className, ...p }: ButtonHTMLAttributes<HTMLButtonElement> & { label: string; active?: boolean }) {
@@ -35,7 +35,7 @@ function MiniTimer() {
   const set = useUi((u) => u.set)
   const clock = formatClock(M.remaining(t, now))
   return (
-    <button type="button" onClick={() => set({ view: 'tasks' })} aria-label={`Revenir au minuteur (${clock})`} title="Revenir au minuteur" className="flex flex-col items-center gap-0.5 rounded-xl p-1 hover:bg-hover">
+    <button type="button" onClick={() => set({ view: 'tasks' })} aria-label={`Back to the timer (${clock})`} title="Back to the timer" className="flex flex-col items-center gap-0.5 rounded-xl p-1 hover:bg-hover">
       <TimerRing progress={M.progress(t, now)} size={36} stroke={3} />
       <span className="text-[11px] tabular-nums text-muted">{clock}</span>
     </button>
@@ -46,14 +46,14 @@ function MiniTimer() {
 export function Rail({ lists, onLists }: { lists: boolean; onLists: () => void }) {
   const { view, set } = useUi()
   return (
-    <nav aria-label="Navigation principale" className="glass flex w-16 shrink-0 flex-col items-center gap-1 rounded-2xl py-3">
+    <nav aria-label="Main navigation" className="glass flex w-16 shrink-0 flex-col items-center gap-1 rounded-2xl py-3">
       <img src="/icon.svg" alt="Cocon" className="mb-3 size-8" />
       {NAV.slice(0, 1).map(({ view: v, label, icon: Icon }) => (
         <RailBtn key={v} label={label} active={view === v && !lists} aria-current={view === v ? 'page' : undefined} onClick={() => set({ view: v })}>
           <Icon size={20} />
         </RailBtn>
       ))}
-      <RailBtn label="Listes et matières" active={lists} aria-expanded={lists} onClick={onLists}>
+      <RailBtn label="Lists and subjects" active={lists} aria-expanded={lists} onClick={onLists}>
         <ListTodo size={20} />
       </RailBtn>
       {NAV.slice(1).map(({ view: v, label, icon: Icon }) => (
@@ -63,7 +63,7 @@ export function Rail({ lists, onLists }: { lists: boolean; onLists: () => void }
       ))}
       <div className="mt-auto flex flex-col items-center gap-2">
         {view !== 'tasks' && <MiniTimer />}
-        <RailBtn label="Mode focus plein écran (F)" onClick={enterFocusMode}>
+        <RailBtn label="Full-screen focus mode (F)" onClick={enterFocusMode}>
           <Maximize2 size={18} />
         </RailBtn>
       </div>

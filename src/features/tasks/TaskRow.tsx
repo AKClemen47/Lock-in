@@ -9,7 +9,7 @@ import { startTask } from '../timer/controller'
 
 export function completeTask(t: Task, done = !t.done) {
   void setTaskDone(t.id, done)
-  if (done) toast(`« ${t.title} » terminée`, { label: 'Annuler', run: () => void setTaskDone(t.id, false) })
+  if (done) toast(`"${t.title}" completed`, { label: 'Undo', run: () => void setTaskDone(t.id, false) })
 }
 
 export function TaskCheck({ task, size = 20 }: { task: Task; size?: number }) {
@@ -19,7 +19,7 @@ export function TaskCheck({ task, size = 20 }: { task: Task; size?: number }) {
       type="button"
       role="checkbox"
       aria-checked={task.done}
-      aria-label={task.done ? `Rouvrir « ${task.title} »` : `Terminer « ${task.title} »`}
+      aria-label={task.done ? `Reopen "${task.title}"` : `Complete "${task.title}"`}
       onClick={() => completeTask(task)}
       className={cx('grid shrink-0 place-items-center rounded-full border-2 transition hover:scale-110', task.done && 'pop')}
       style={{ width: size, height: size, borderColor: color, background: task.done ? color : 'transparent' }}
@@ -50,11 +50,11 @@ export function TaskRow({ task, project, today, showProject }: { task: Task; pro
           {task.dueDate && (
             <span className={cx(late && 'text-red-400')}>
               {formatDue(task.dueDate, today)}
-              {task.dueTime && ` ${task.dueTime.replace(':', ' h ')}`}
+              {task.dueTime && ` ${task.dueTime}`}
             </span>
           )}
           {(task.estimate > 0 || task.spent > 0) && (
-            <span title="Pomodoros réalisés / estimés">
+            <span title="Pomodoros done / estimated">
               🍅 {task.spent}
               {task.estimate > 0 && `/${task.estimate}`}
             </span>
@@ -64,13 +64,13 @@ export function TaskRow({ task, project, today, showProject }: { task: Task; pro
               <ListChecks size={12} /> {subDone}/{task.subtasks.length}
             </span>
           )}
-          {task.reminderAt && !task.reminded && <Bell size={12} aria-label="Rappel programmé" />}
+          {task.reminderAt && !task.reminded && <Bell size={12} aria-label="Reminder set" />}
           {task.notes && <NotebookPen size={12} aria-label="Notes" />}
         </div>
       </button>
       {!task.done && (
         <IconBtn
-          label={`Lancer un Pomodoro sur « ${task.title} »`}
+          label={`Start a Pomodoro on "${task.title}"`}
           className="opacity-0 group-hover:opacity-100 focus-visible:opacity-100 max-md:opacity-60"
           onClick={() => startTask(task.id)}
         >

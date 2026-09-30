@@ -9,7 +9,7 @@ import { Btn } from '../../components/ui'
 
 Chart.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend)
 
-/** Neutral for "Sans matière": never a categorical hue. */
+/** Neutral for "No subject": never a categorical hue. */
 export const NO_PROJECT_COLOR = '#8a8799'
 
 const cssVar = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name).trim()
@@ -24,7 +24,7 @@ export interface SeriesInfo {
 export function seriesOf(ids: Iterable<string>, projects: Project[]): SeriesInfo[] {
   const present = new Set(ids)
   const out: SeriesInfo[] = projects.filter((p) => present.has(p.id)).map((p) => ({ id: p.id, name: p.name, color: p.color }))
-  if (present.has(NO_PROJECT)) out.push({ id: NO_PROJECT, name: 'Sans matière', color: NO_PROJECT_COLOR })
+  if (present.has(NO_PROJECT)) out.push({ id: NO_PROJECT, name: 'No subject', color: NO_PROJECT_COLOR })
   return out
 }
 
@@ -48,13 +48,13 @@ export function FocusChart({ buckets, projects, hourly }: { buckets: Buckets; pr
     return 0
   }
 
-  if (!series.length) return <p className="py-16 text-center text-sm text-muted">Aucune session sur cette période.</p>
+  if (!series.length) return <p className="py-16 text-center text-sm text-muted">No sessions in this period.</p>
 
   return (
     <div>
       <div className="h-64">
         <Bar
-          aria-label="Temps de focus par matière"
+          aria-label="Focus time by subject"
           role="img"
           data={{
             labels: buckets.labels,
@@ -92,8 +92,8 @@ export function FocusChart({ buckets, projects, hourly }: { buckets: Buckets; pr
               tooltip: {
                 filter: (item) => (item.raw as number) > 0,
                 callbacks: {
-                  label: (item) => ` ${item.dataset.label} : ${formatDuration((item.raw as number) * unit)}`,
-                  footer: (items) => (items.length > 1 ? `Total : ${formatDuration(totals[items[0].dataIndex])}` : ''),
+                  label: (item) => ` ${item.dataset.label}: ${formatDuration((item.raw as number) * unit)}`,
+                  footer: (items) => (items.length > 1 ? `Total: ${formatDuration(totals[items[0].dataIndex])}` : ''),
                 },
               },
             },
@@ -102,14 +102,14 @@ export function FocusChart({ buckets, projects, hourly }: { buckets: Buckets; pr
       </div>
       <div className="mt-2 text-right">
         <Btn variant="ghost" className="px-2 py-1 text-xs" aria-expanded={table} onClick={() => setTable(!table)}>
-          {table ? 'Masquer le tableau' : 'Voir en tableau'}
+          {table ? 'Hide table' : 'Show as table'}
         </Btn>
       </div>
       {table && (
         <table className="mt-2 w-full text-sm">
           <thead className="text-left text-xs text-muted">
             <tr>
-              <th className="py-1 font-normal">{hourly ? 'Heure' : 'Jour'}</th>
+              <th className="py-1 font-normal">{hourly ? 'Hour' : 'Day'}</th>
               {series.map((s) => (
                 <th key={s.id} className="py-1 font-normal">{s.name}</th>
               ))}

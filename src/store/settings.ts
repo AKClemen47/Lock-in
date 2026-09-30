@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { Durations } from '../lib/timerMachine'
 
-export const THEME_IDS = ['pluie', 'cheminee', 'foret', 'mer', 'cafe', 'soiree'] as const
+export const THEME_IDS = ['zen', 'train', 'ocean', 'cheminee', 'foret', 'mer', 'cafe', 'soiree'] as const
 export type ThemeId = (typeof THEME_IDS)[number]
 export type ChimeStyle = 'cloche' | 'carillon' | 'bol'
 export type BreakBehavior = 'continue' | 'lower' | 'stop'
@@ -50,8 +50,8 @@ export const DEFAULT_SETTINGS: Settings = {
   autoStartBreaks: false,
   autoStartFocus: false,
   dailyGoal: 8,
-  visualTheme: 'pluie',
-  soundTheme: 'pluie',
+  visualTheme: 'zen',
+  soundTheme: 'zen',
   linkSound: true,
   favorites: [],
   mixes: {},
@@ -93,7 +93,7 @@ export const useSettings = create<SettingsStore>()(
       setMix: (theme, layer, v) => set((s) => ({ mixes: { ...s.mixes, [theme]: { ...s.mixes[theme], [layer]: v } } })),
       setVolume: (bus, v) => set((s) => ({ volumes: { ...s.volumes, [bus]: v } })),
     }),
-    { name: 'cocon-settings', version: 2, migrate: (old) => ({ ...(old as Settings), ...fixThemes(old as Partial<Settings>) }) },
+    { name: 'cocon-settings', version: 3, migrate: (old) => ({ ...(old as Settings), ...fixThemes(old as Partial<Settings>) }) },
   ),
 )
 
@@ -103,10 +103,10 @@ export function settingsSnapshot(): Settings {
   return Object.fromEntries(Object.keys(DEFAULT_SETTINGS).map((k) => [k, s[k as keyof Settings]])) as unknown as Settings
 }
 
-/** Maps theme ids from older versions and backups ('lofi' became 'soiree'); unknown ids fall back to the default. */
+/** Maps theme ids from older versions and backups ('lofi' and 'pluie' became 'soiree'); unknown ids fall back to the default. */
 export function fixThemes(s: Partial<Settings>): Partial<Settings> {
   const fix = (t: unknown): ThemeId | null => {
-    const id = t === 'lofi' ? 'soiree' : t
+    const id = t === 'lofi' || t === 'pluie' ? 'soiree' : t
     return THEME_IDS.includes(id as ThemeId) ? (id as ThemeId) : null
   }
   const out = { ...s }

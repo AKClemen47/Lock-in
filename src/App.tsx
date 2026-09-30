@@ -24,11 +24,11 @@ import { Onboarding } from './features/onboarding/Onboarding'
 const StatsView = lazy(() => import('./features/stats/StatsView').then((m) => ({ default: m.StatsView })))
 
 const TABS: { view: View; label: string; icon: typeof Timer }[] = [
-  { view: 'timer', label: 'Minuteur', icon: Timer },
-  { view: 'tasks', label: 'Tâches', icon: CheckSquare },
+  { view: 'timer', label: 'Timer', icon: Timer },
+  { view: 'tasks', label: 'Tasks', icon: CheckSquare },
   { view: 'stats', label: 'Stats', icon: BarChart3 },
-  { view: 'ambience', label: 'Ambiances', icon: Waves },
-  { view: 'settings', label: 'Réglages', icon: Settings },
+  { view: 'ambience', label: 'Ambiences', icon: Waves },
+  { view: 'settings', label: 'Settings', icon: Settings },
 ]
 
 function Main({ view }: { view: View }) {
@@ -84,10 +84,10 @@ export default function App() {
           {desktop && view === 'tasks' ? (
             <>
               {/* Home: the timer sits straight on the video, tasks and sound on the right. */}
-              <section aria-label="Minuteur" className="grid min-w-0 flex-1 place-items-center overflow-y-auto">
+              <section aria-label="Timer" className="grid min-w-0 flex-1 place-items-center overflow-y-auto">
                 <TimerStage />
               </section>
-              <aside aria-label="Tâches" className="flex w-[380px] shrink-0 flex-col gap-3">
+              <aside aria-label="Tasks" className="flex w-[380px] shrink-0 flex-col gap-3">
                 <div className="glass min-h-0 flex-1 overflow-hidden rounded-2xl">
                   <TaskList />
                 </div>

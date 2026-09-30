@@ -40,7 +40,7 @@ export function TimerRing({ progress, size, stroke = 10 }: { progress: number; s
 /** Drawn over the video (timer stage, focus mode). */
 export function CycleDots({ cycle, total }: { cycle: number; total: number }) {
   return (
-    <div className="flex justify-center gap-1.5" aria-label={`${cycle} session${cycle > 1 ? 's' : ''} sur ${total} avant la pause longue`}>
+    <div className="flex justify-center gap-1.5" aria-label={`${cycle} of ${total} sessions before the long break`}>
       {Array.from({ length: total }, (_, i) => (
         <span key={i} className={cx('size-2 rounded-full', i < cycle ? 'bg-accent' : 'bg-white/35')} />
       ))}
@@ -63,11 +63,11 @@ function StopButton() {
   return (
     <button
       type="button"
-      aria-label={armed ? 'Confirmer l’abandon' : 'Arrêter'}
+      aria-label={armed ? 'Confirm stop' : 'Stop'}
       className={cx(ROUND, 'size-16 text-xs', armed && 'border-red-300 bg-red-500/40')}
       onClick={() => (armed ? (setArmed(false), void stopTimer()) : setArmed(true))}
     >
-      {armed ? 'Confirmer' : 'Arrêter'}
+      {armed ? 'Confirm' : 'Stop'}
     </button>
   )
 }
@@ -81,23 +81,23 @@ function TaskChip() {
     <div className="flex w-72 max-w-full items-center gap-3 rounded-xl bg-white/90 px-3 py-2 text-[#1d1a2b] shadow-lg [text-shadow:none]">
       {task && <TaskCheck task={task} />}
       <label className="relative min-w-0 flex-1 cursor-pointer">
-        <span className="block truncate text-sm font-medium">{task ? task.title : 'Choisir une tâche…'}</span>
+        <span className="block truncate text-sm font-medium">{task ? task.title : 'Choose a task…'}</span>
         {task?.estimate ? (
-          <span className="mt-1 flex gap-1" aria-label={`${task.spent} pomodoros sur ${task.estimate}`}>
+          <span className="mt-1 flex gap-1" aria-label={`${task.spent} of ${task.estimate} pomodoros`}>
             {Array.from({ length: Math.min(task.estimate, 10) }, (_, i) => (
               <span key={i} className={cx('size-2 rounded-full', i < task.spent ? 'bg-[#ef6b5b]' : 'bg-[#e2dcef]')} />
             ))}
           </span>
         ) : (
-          <span className="block text-xs text-[#6b6581]">{task ? `${task.spent} 🍅` : 'Facultatif'}</span>
+          <span className="block text-xs text-[#6b6581]">{task ? `${task.spent} 🍅` : 'Optional'}</span>
         )}
         <select
-          aria-label="Tâche en cours"
+          aria-label="Current task"
           className="absolute inset-0 size-full cursor-pointer opacity-0"
           value={taskId ?? ''}
           onChange={(e) => setTimerTask(e.target.value || null)}
         >
-          <option value="">— Aucune tâche —</option>
+          <option value="">— No task —</option>
           {tasks.map((x) => (
             <option key={x.id} value={x.id}>
               {x.title}
@@ -121,7 +121,7 @@ export function TimerStage() {
     <div className="flex flex-col items-center gap-5 bg-[radial-gradient(closest-side,rgb(0_0_0/0.3),transparent)] px-6 py-4 text-white [text-shadow:0_1px_8px_rgb(0_0_0/0.55)]">
       <div className="glass w-72 max-w-full rounded-xl text-fg [text-shadow:none]">
         <Segmented
-          label="Type de session"
+          label="Session type"
           size="sm"
           value={t.phase}
           onChange={(p) => goToPhase(p)}
@@ -138,7 +138,7 @@ export function TimerStage() {
           </div>
           <div className="text-xs uppercase tracking-[0.2em] text-white/80">
             {PHASE_LABEL[t.phase]}
-            {t.status === 'paused' && ' · en pause'}
+            {t.status === 'paused' && ' · paused'}
           </div>
           <CycleDots cycle={t.cycle} total={longEvery} />
         </div>
@@ -147,10 +147,10 @@ export function TimerStage() {
       <div className="flex items-center gap-4">
         {t.status !== 'idle' && <StopButton />}
         <button type="button" onClick={toggleTimer} className={cx(ROUND, 'size-20 text-sm font-medium')}>
-          {running ? 'Pause' : t.status === 'paused' ? 'Reprendre' : 'Démarrer'}
+          {running ? 'Pause' : t.status === 'paused' ? 'Resume' : 'Start'}
         </button>
         <button type="button" onClick={() => void skipPhase()} className={cx(ROUND, 'size-16 text-xs')}>
-          Passer
+          Skip
         </button>
       </div>
       <div className="-mt-2 flex gap-4 text-xs text-white/80">
@@ -176,7 +176,7 @@ export function TimerSide() {
         <Plant progress={t.phase === 'focus' && t.status !== 'idle' ? M.progress(t, now) : 0} outcome={plant} size={48} />
         <div className="min-w-0 flex-1">
           <div className="flex justify-between text-sm">
-            <span className="font-medium">Objectif du jour</span>
+            <span className="font-medium">Daily goal</span>
             <span className="text-muted">{done} / {s.dailyGoal} 🍅</span>
           </div>
           <div className="mt-2 h-2 overflow-hidden rounded-full bg-line" role="progressbar" aria-valuenow={done} aria-valuemax={s.dailyGoal}>
@@ -189,13 +189,13 @@ export function TimerSide() {
         <button type="button" className="min-w-0 flex-1 truncate text-left text-sm" onClick={() => setUi({ view: 'ambience' })}>
           {theme.emoji} {theme.name}
         </button>
-        <IconBtn label={ambiencePlaying ? 'Couper l’ambiance' : 'Lancer l’ambiance'} onClick={toggleAmbience} variant={ambiencePlaying ? 'primary' : 'soft'}>
+        <IconBtn label={ambiencePlaying ? 'Stop ambience' : 'Play ambience'} onClick={toggleAmbience} variant={ambiencePlaying ? 'primary' : 'soft'}>
           <Music size={16} />
         </IconBtn>
-        <IconBtn label={s.muted ? 'Réactiver le son (M)' : 'Muet (M)'} onClick={toggleMute}>
+        <IconBtn label={s.muted ? 'Unmute (M)' : 'Mute (M)'} onClick={toggleMute}>
           {s.muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
         </IconBtn>
-        <IconBtn label="Mode focus plein écran (F)" onClick={enterFocusMode}>
+        <IconBtn label="Full-screen focus mode (F)" onClick={enterFocusMode}>
           <Maximize2 size={16} />
         </IconBtn>
       </div>
@@ -204,7 +204,7 @@ export function TimerSide() {
   )
 }
 
-/** Small screens: the "Minuteur" tab. */
+/** Small screens: the "Timer" tab. */
 export function TimerPanel() {
   return (
     <div className="flex h-full flex-col items-center gap-6 overflow-y-auto p-5">
