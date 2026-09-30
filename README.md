@@ -18,7 +18,7 @@ npm run dev        # http://localhost:5173
 
 ## Fonctionnalités (MVP)
 
-- **Minuteur** : focus / pause courte / pause longue, durées et enchaînements réglables, +1/+5 min, passer ou arrêter, fiable en arrière-plan (horodatage absolu + Web Worker), reprise après rechargement.
+- **Minuteur** : posé au centre de l'écran, directement sur la vidéo, avec une couronne de pétales qui se remplit (façon Focus To-Do) ; focus / pause courte / pause longue, durées et enchaînements réglables, +1/+5 min, passer ou arrêter, fiable en arrière-plan (horodatage absolu + Web Worker), reprise après rechargement.
 - **Mode focus** : plein écran immersif, gros chrono, contrôles qui s'effacent, écran maintenu allumé.
 - **Tâches** : ajout rapide en langage naturel (`Réviser chap. 3 #Maths demain 18h ~2 !1`), matières colorées avec objectif hebdo, listes intelligentes (aujourd'hui, demain, 7 jours, planifiées, en retard…), sous-tâches, notes Markdown, rappels, estimation en 🍅 et heure de fin prévue.
 - **Statistiques** : jour / semaine / mois, temps par matière (barres empilées + vue tableau), Pomodoros, tâches terminées, série, calendrier de régularité.
@@ -44,7 +44,7 @@ src/
   lib/                logique pure (minuteur, ajout rapide, stats, dates) + base Dexie
   store/              état Zustand (réglages, minuteur, UI)
   features/           timer, focus, tasks, stats, ambience, settings, onboarding, garden
-  components/         UI partagée, fond animé, toasts
+  components/         UI partagée, barre de navigation, fond vidéo, toasts
 ```
 
 ## Crédits vidéo

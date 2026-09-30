@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, type CSSProperties } from 'react'
+import { Suspense, lazy, useEffect, useState, type CSSProperties } from 'react'
 import { BarChart3, CheckSquare, Settings, Timer, Waves } from 'lucide-react'
 import { useSettings } from './store/settings'
 import { useUi, type View } from './store/ui'
@@ -10,7 +10,8 @@ import { useTimerEngine } from './features/timer/useTimerEngine'
 import { Backdrop } from './components/Backdrop'
 import { Announcer, Celebration, Toasts } from './components/Overlays'
 import { cx } from './components/ui'
-import { TimerPanel } from './features/timer/TimerPanel'
+import { Rail } from './components/Rail'
+import { TimerPanel, TimerSide, TimerStage } from './features/timer/TimerPanel'
 import { FocusMode } from './features/focus/FocusMode'
 import { ProjectEditorHost, Sidebar } from './features/tasks/Sidebar'
 import { TaskList } from './features/tasks/TaskList'
@@ -42,8 +43,9 @@ function Main({ view }: { view: View }) {
 export default function App() {
   const accent = themeById(useSettings((s) => s.visualTheme)).accent
   const onboarded = useSettings((s) => s.onboarded)
-  const { view, focusMode, set } = useUi()
+  const { view, list, focusMode, set } = useUi()
   const desktop = useMediaQuery('(min-width: 1024px)')
+  const [lists, setLists] = useState(false)
 
   useEffect(unlockOnGesture, [])
   useTimerEngine()
@@ -58,6 +60,10 @@ export default function App() {
   useEffect(() => {
     if (desktop && view === 'timer') set({ view: 'tasks' })
   }, [desktop, view, set])
+  // The lists drawer closes once a list or another view is picked.
+  useEffect(() => setLists(false), [list, view])
+
+  const stage = !desktop && view === 'timer'
 
   return (
     <div className="h-full" style={{ '--accent': accent } as CSSProperties}>
@@ -65,15 +71,33 @@ export default function App() {
       {focusMode ? (
         <FocusMode />
       ) : (
-        <div className="flex h-full gap-3 p-0 lg:p-3">
-          {desktop && <Sidebar />}
-          <main className="glass min-w-0 flex-1 overflow-hidden max-lg:rounded-none max-lg:border-0 max-lg:pb-16 lg:rounded-2xl">
-            {!desktop && view === 'timer' ? <TimerPanel /> : <Main view={view} />}
-          </main>
-          {desktop && (
-            <aside className="glass w-[360px] shrink-0 overflow-hidden rounded-2xl" aria-label="Minuteur">
-              <TimerPanel />
-            </aside>
+        <div className="relative flex h-full gap-3 p-0 lg:p-3">
+          {desktop && <Rail lists={lists} onLists={() => setLists(!lists)} />}
+          {desktop && lists && (
+            <>
+              <div className="fixed inset-0 z-10" onClick={() => setLists(false)} />
+              <div className="absolute inset-y-3 left-[88px] z-20 shadow-2xl">
+                <Sidebar />
+              </div>
+            </>
+          )}
+          {desktop && view === 'tasks' ? (
+            <>
+              {/* Home: the timer sits straight on the video, tasks and sound on the right. */}
+              <section aria-label="Minuteur" className="grid min-w-0 flex-1 place-items-center overflow-y-auto">
+                <TimerStage />
+              </section>
+              <aside aria-label="Tâches" className="flex w-[380px] shrink-0 flex-col gap-3">
+                <div className="glass min-h-0 flex-1 overflow-hidden rounded-2xl">
+                  <TaskList />
+                </div>
+                <TimerSide />
+              </aside>
+            </>
+          ) : (
+            <main className={cx('min-w-0 flex-1 overflow-hidden max-lg:pb-16', !stage && 'glass max-lg:rounded-none max-lg:border-0 lg:rounded-2xl')}>
+              {stage ? <TimerPanel /> : <Main view={view} />}
+            </main>
           )}
           {!desktop && (
             <nav aria-label="Navigation" className="glass fixed inset-x-0 bottom-0 z-30 flex border-x-0 border-b-0 pb-[env(safe-area-inset-bottom)]">

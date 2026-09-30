@@ -1,9 +1,9 @@
 import { useState, type ReactNode } from 'react'
 import { create } from 'zustand'
-import { BarChart3, CheckSquare, Pencil, Plus, Settings, Waves } from 'lucide-react'
+import { Pencil, Plus } from 'lucide-react'
 import type { Project } from '../../lib/db'
 import { useProjects, useTasks, useToday } from '../../lib/hooks'
-import { useUi, type ListSel, type View } from '../../store/ui'
+import { useUi, type ListSel } from '../../store/ui'
 import { IconBtn, cx } from '../../components/ui'
 import { ProjectEditor } from './ProjectEditor'
 import { SMART_LISTS, inList } from './lists'
@@ -16,13 +16,6 @@ export function ProjectEditorHost() {
   const editing = useProjectEditor((s) => s.editing)
   return <ProjectEditor project={editing} onClose={() => useProjectEditor.setState({ editing: undefined })} />
 }
-
-const NAV: { view: View; label: string; icon: typeof CheckSquare }[] = [
-  { view: 'tasks', label: 'Tâches', icon: CheckSquare },
-  { view: 'stats', label: 'Statistiques', icon: BarChart3 },
-  { view: 'ambience', label: 'Ambiances', icon: Waves },
-  { view: 'settings', label: 'Réglages', icon: Settings },
-]
 
 const same = (a: ListSel, b: ListSel) => a.kind === b.kind && a.id === b.id
 
@@ -56,21 +49,8 @@ export function Sidebar() {
   const archived = projects.filter((p) => p.archived)
 
   return (
-    <aside className="glass flex h-full w-64 shrink-0 flex-col gap-4 overflow-y-auto rounded-2xl p-3">
-      <div className="flex items-center gap-2 px-2 pt-1">
-        <img src="/icon.svg" alt="" className="size-7" />
-        <span className="text-lg font-semibold tracking-tight">Cocon</span>
-      </div>
-
-      <nav aria-label="Navigation principale" className="space-y-0.5">
-        {NAV.map(({ view: v, label, icon: Icon }) => (
-          <Item key={v} active={view === v} onClick={() => set({ view: v })}>
-            <Icon size={16} className="text-muted" /> {label}
-          </Item>
-        ))}
-      </nav>
-
-      <section aria-label="Listes intelligentes" className="space-y-0.5 border-t border-line pt-3">
+    <aside aria-label="Listes et matières" className="glass flex h-full w-64 shrink-0 flex-col gap-4 overflow-y-auto rounded-2xl p-3">
+      <section aria-label="Listes intelligentes" className="space-y-0.5">
         {SMART_LISTS.filter((l) => l.id !== 'done').map((l) => {
           const sel: ListSel = { kind: 'smart', id: l.id }
           return (

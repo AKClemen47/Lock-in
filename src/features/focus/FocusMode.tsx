@@ -9,7 +9,8 @@ import { useTimer } from '../../store/timer'
 import { useSettings } from '../../store/settings'
 import { useUi } from '../../store/ui'
 import { IconBtn, cx } from '../../components/ui'
-import { CycleDots, TimerRing } from '../timer/TimerPanel'
+import { CycleDots } from '../timer/TimerPanel'
+import { PetalDial } from '../timer/PetalDial'
 import { PHASE_LABEL, exitFocusMode, skipPhase, toggleAmbience, toggleMute, toggleTimer } from '../timer/controller'
 
 /** Immersive full-screen timer; controls fade out after 3 s without pointer activity. */
@@ -48,9 +49,8 @@ export function FocusMode() {
       className={cx('fade-in fixed inset-0 z-40 flex flex-col items-center justify-center text-white', hide && 'cursor-none')}
       style={{ background: 'radial-gradient(ellipse at center, rgb(0 0 0 / 0.35), transparent 70%)' }}
     >
-      <div className="relative">
-        <TimerRing progress={M.progress(t, now)} size={Math.min(380, window.innerWidth - 48)} stroke={6} />
-        <div className="absolute inset-0 grid place-items-center text-center [text-shadow:0_2px_16px_rgb(0_0_0/0.6)]">
+      <PetalDial progress={M.progress(t, now)} running={running} size={Math.min(380, window.innerWidth - 48)}>
+        <div className="[text-shadow:0_2px_16px_rgb(0_0_0/0.6)]">
           <div className="space-y-2">
             <div className="text-7xl font-extralight tabular-nums tracking-tight sm:text-8xl" role="timer">
               {formatClock(M.remaining(t, now))}
@@ -62,7 +62,7 @@ export function FocusMode() {
             {showTaskInFocus && task && <div className="mx-auto max-w-64 truncate text-sm opacity-70">{task.title}</div>}
           </div>
         </div>
-      </div>
+      </PetalDial>
 
       <div className={cx('mt-8 flex items-center gap-3 transition-opacity duration-700', hide ? 'opacity-0' : 'opacity-100')}>
         <CycleDots cycle={t.cycle} total={durations.longEvery} />

@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cocon · chrono</title>
+<style>
+  :root { --fg: #f3f0fa; --muted: #aaa4c0; --line: rgb(255 255 255 / .12); --accent: #a8e6a1; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0d0c15; color: var(--fg); font: 15px/1.5 system-ui, sans-serif; }
+  main { max-width: 1100px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .lead { color: var(--muted); margin: 0 0 12px; }
+  .bar-top { display: flex; flex-wrap: wrap; gap: 8px; position: sticky; top: 0; padding: 10px 0; background: #0d0c15; z-index: 5; margin-bottom: 16px; }
+  .bar-top button { background: #1c1a2a; color: var(--fg); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; font: inherit; cursor: pointer; }
+  .bar-top button[aria-pressed="true"] { background: var(--fg); color: #111; }
+  .bar-top .sep { width: 1px; background: var(--line); margin: 0 4px; }
+  figure { margin: 0 0 40px; }
+  figcaption { margin-top: 10px; }
+  figcaption b { font-size: 17px; }
+  figcaption span { color: var(--muted); display: block; }
+
+  .screen { position: relative; aspect-ratio: 16 / 10; border-radius: 14px; overflow: hidden; container-type: inline-size; border: 1px solid var(--line); font-size: 1.05cqw; }
+  .bg { position: absolute; inset: 0; background: #000 var(--poster) center / cover no-repeat; }
+  .scrim { position: absolute; inset: 0; background:
+      radial-gradient(circle at 37% 52%, rgb(0 0 0 / .32), transparent 30%),
+      linear-gradient(90deg, transparent 55%, rgb(8 7 16 / .45) 75%); }
+  .ui { position: absolute; inset: 0; padding: 1.1cqw; display: grid; gap: 1.1cqw; grid-template-columns: 4.2cqw 1fr 30%; }
+  .glass { border: 1px solid var(--line); border-radius: 1.2cqw; padding: 1.2cqw; background: rgb(20 18 34 / .5); backdrop-filter: blur(1.2cqw) saturate(1.2); }
+  .rail { background: rgb(20 18 34 / .4); backdrop-filter: blur(1cqw); border: 1px solid var(--line); border-radius: 1.2cqw; padding: 1cqw .6cqw; text-align: center; font-size: 1.5cqw; line-height: 2.6; }
+  .row { display: flex; align-items: center; gap: .8cqw; }
+  h2 { font-size: 1.7cqw; margin: 0 0 1cqw; }
+  .add { border: 1px solid var(--line); border-radius: .8cqw; padding: .6cqw 1cqw; color: var(--muted); margin-bottom: 1cqw; background: rgb(255 255 255 / .05); }
+  .task { padding: .7cqw .3cqw; border-bottom: 1px solid var(--line); }
+  .task i { width: 1.3cqw; height: 1.3cqw; border: 2px solid var(--muted); border-radius: 50%; flex: none; }
+  .task em { font-style: normal; font-size: .9cqw; color: var(--muted); margin-left: auto; }
+  .task.cur { background: rgb(255 255 255 / .07); border-radius: .6cqw; }
+  .side { display: grid; gap: 1.1cqw; grid-template-rows: 1fr auto; min-height: 0; }
+  .vol { height: .4cqw; border-radius: 1cqw; background: rgb(255 255 255 / .15); margin-top: .6cqw; }
+  .vol::before { content: ""; display: block; height: 100%; width: 60%; border-radius: inherit; background: var(--accent); }
+  .muted { color: var(--muted); }
+
+  /* Centre: the Focus To-Do style timer, straight on the video. */
+  .center { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.6cqw; text-shadow: 0 1px 8px rgb(0 0 0 / .55); min-width: 0; }
+  .chip { display: flex; align-items: center; gap: 1cqw; padding: .7cqw 1.4cqw; border-radius: .9cqw; background: rgb(255 255 255 / .9); color: #1d1a2b; text-shadow: none; min-width: 22cqw; }
+  .chip i { width: 1.3cqw; height: 1.3cqw; border: 2px solid #8a84a0; border-radius: 50%; flex: none; }
+  .chip .poms { display: flex; gap: .35cqw; margin-top: .2cqw; }
+  .chip .poms span { width: .75cqw; height: .75cqw; border-radius: 50%; background: #e2dcef; }
+  .chip .poms span.done { background: #ef6b5b; }
+  .chip small { display: block; font-size: .85cqw; color: #6b6581; }
+  .dial { position: relative; width: 29cqw; aspect-ratio: 1; }
+  .dial svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 0 .4cqw rgb(0 0 0 / .45)); }
+  .petal { fill: rgb(255 255 255 / .16); stroke: rgb(255 255 255 / .95); stroke-width: 1.2; transition: fill .5s, stroke .5s; }
+  .petal.on { fill: var(--ink); stroke: var(--ink); }
+  .petal.now { animation: pulse 1.6s ease-in-out infinite; stroke: var(--ink); }
+  @keyframes pulse { 50% { fill: color-mix(in srgb, var(--ink) 55%, transparent); } }
+  .time { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
+  .time b { font-size: 6.2cqw; font-weight: 200; letter-spacing: -.05cqw; line-height: 1; font-variant-numeric: tabular-nums; font-family: "Segoe UI Variable Display", "Helvetica Neue", system-ui, sans-serif; }
+  .time small { font-size: 1.1cqw; color: rgb(255 255 255 / .8); margin-top: .6cqw; letter-spacing: .15cqw; text-transform: uppercase; }
+  .btns { display: flex; gap: 1.6cqw; }
+  .btns span { width: 6cqw; height: 6cqw; border-radius: 50%; border: 1.5px solid rgb(255 255 255 / .85); display: grid; place-items: center; font-size: 1.05cqw; background: rgb(0 0 0 / .12); backdrop-filter: blur(.4cqw); }
+  .white { --ink: #fff; }
+  .tint { --ink: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>B · chrono au centre, façon Focus To-Do</h1>
+  <p class="lead">Une couronne de 25 pétales (une par minute) qui se remplissent au fil de la session, chiffres fins au centre, boutons ronds dessous. Menu en barre d'icônes à gauche, tâches et son à droite, le reste de l'écran laisse voir la vidéo.</p>
+  <div class="bar-top">
+    <button data-t="foret" aria-pressed="true">🌲 Forêt</button>
+    <button data-t="pluie">🌧️ Pluie</button>
+    <button data-t="cheminee">🔥 Feu</button>
+    <button data-t="mer">🌊 Mer</button>
+    <button data-t="cafe">☕ Café</button>
+    <button data-t="soiree">🌃 Soirée</button>
+    <span class="sep"></span>
+    <button id="sim">▶ Simuler une session (25 min en 20 s)</button>
+  </div>
+
+  <template id="screen">
+    <div class="screen"><div class="bg"></div><div class="scrim"></div>
+      <div class="ui">
+        <div class="rail">🌱<br>⏱<br>✅<br>📊<br>🎧<br>⚙️</div>
+        <div class="center">
+          <div class="chip"><i></i><div><b>Réviser chap. 3</b><div class="poms"><span class="done"></span><span></span><span></span></div></div></div>
+          <div class="dial"><svg viewBox="-100 -100 200 200"></svg><div class="time"><b>25:00</b><small>Focus</small></div></div>
+          <div class="btns"><span class="go">Démarrer</span></div>
+        </div>
+        <div class="side">
+          <div class="glass">
+            <h2>Aujourd'hui</h2>
+            <div class="add">+ Ajouter une tâche…</div>
+            <div class="task row cur"><i></i>Réviser chap. 3<em>🍅 1/3</em></div>
+            <div class="task row"><i></i>Exos de thermo<em>🍅 3</em></div>
+            <div class="task row"><i></i>Lire l'article d'anglais<em>🍅 1</em></div>
+            <div class="task row"><i></i>Fiche de synthèse TP<em>🍅 2</em></div>
+          </div>
+          <div class="glass"><div class="row"><b class="tname"></b><span class="muted" style="margin-left:auto">▶</span></div><div class="vol"></div></div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <figure><div class="slot white"></div>
+    <figcaption><b>B1 · Pétales blancs</b><span>Au plus près de Focus To-Do : sobre, lisible sur toutes les vidéos.</span></figcaption></figure>
+  <figure><div class="slot tint"></div>
+    <figcaption><b>B2 · Pétales couleur de l'ambiance</b><span>Les pétales prennent la teinte du thème (vert en forêt, orange au coin du feu, rose en soirée…).</span></figcaption></figure>
+</main>
+<script>
+  const THEMES = {
+    foret: ['🌲 Forêt ensoleillée', '#a8e6a1'], pluie: ['🌧️ Pluie sur la fenêtre', '#8cc8ff'], cheminee: ['🔥 Feu de cheminée', '#ffab66'],
+    mer: ['🌊 Mer au coucher du soleil', '#ffb4a2'], cafe: ['☕ Café cosy', '#e8c48f'], soiree: ['🌃 Soirée studieuse', '#ff9ad5'],
+  }
+  const N = 25, TOTAL = 25 * 60
+  // A drop with its tip pointing outwards, on the ring at radius 78.
+  const PETAL = 'M0,-89 C3.2,-84 5,-80.5 5,-78 A5,5 0 0 1 -5,-78 C-5,-80.5 -3.2,-84 0,-89Z'
+  document.querySelectorAll('.slot').forEach((slot) => {
+    slot.append(document.getElementById('screen').content.cloneNode(true))
+    const svg = slot.querySelector('svg')
+    svg.innerHTML = Array.from({ length: N }, (_, i) => `<path class="petal" d="${PETAL}" transform="rotate(${(360 / N) * i})"/>`).join('')
+  })
+
+  const render = (left, running) => {
+    const done = (TOTAL - left) / 60
+    document.querySelectorAll('.dial').forEach((d) => {
+      d.querySelectorAll('.petal').forEach((p, i) => {
+        p.classList.toggle('on', i < Math.floor(done))
+        p.classList.toggle('now', running && i === Math.floor(done))
+      })
+      d.querySelector('b').textContent = `${String(Math.floor(left / 60)).padStart(2, '0')}:${String(Math.floor(left % 60)).padStart(2, '0')}`
+    })
+    document.querySelectorAll('.btns').forEach((b) => (b.innerHTML = running ? '<span>Pause</span><span>Arrêter</span>' : '<span>Démarrer</span>'))
+  }
+
+  let raf = 0
+  document.getElementById('sim').onclick = (e) => {
+    cancelAnimationFrame(raf)
+    const t0 = performance.now()
+    const step = (now) => {
+      const left = Math.max(0, TOTAL - ((now - t0) / 20000) * TOTAL)
+      render(left, left > 0)
+      if (left > 0) raf = requestAnimationFrame(step)
+    }
+    raf = requestAnimationFrame(step)
+  }
+
+  const pick = (t) => {
+    document.documentElement.style.setProperty('--poster', `url(/ambiences/${t}.jpg)`)
+    document.documentElement.style.setProperty('--accent', THEMES[t][1])
+    document.querySelectorAll('.tname').forEach((n) => (n.textContent = THEMES[t][0]))
+    document.querySelectorAll('[data-t]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.t === t))
+  }
+  document.querySelector('.bar-top').addEventListener('click', (e) => e.target.dataset.t && pick(e.target.dataset.t))
+  pick('foret')
+  render(14 * 60 + 32, true) // mid-session, so the progress shows
+</script>
+</body>
+</html>

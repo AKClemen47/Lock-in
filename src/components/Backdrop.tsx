@@ -5,7 +5,7 @@ import { useUi } from '../store/ui'
 import { useTimer } from '../store/timer'
 import { useReducedMotion } from '../lib/hooks'
 
-/** Full-page ambience video with a 1.2 s crossfade between themes and a readability scrim. */
+/** Full-page ambience video with a 1.2 s crossfade between themes and a light scrim (panels carry their own glass). */
 export function Backdrop() {
   const { visualTheme, economy, bgMode, scrim } = useSettings()
   const focusMode = useUi((u) => u.focusMode)
@@ -30,7 +30,7 @@ export function Backdrop() {
       ))}
       <div
         className="absolute inset-0 transition-[background] duration-700"
-        style={{ background: `rgb(var(--scrim) / ${focusMode ? scrim * 0.4 : scrim})` }}
+        style={{ background: `rgb(var(--scrim) / ${scrim * 0.4})` }}
       />
     </div>
   )

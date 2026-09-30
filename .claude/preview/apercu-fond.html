@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cocon · voir le fond</title>
+<style>
+  :root { --fg: #f3f0fa; --muted: #aaa4c0; --line: rgb(255 255 255 / .12); --accent: #a8e6a1; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0d0c15; color: var(--fg); font: 15px/1.5 system-ui, sans-serif; }
+  main { max-width: 1100px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .lead { color: var(--muted); margin: 0 0 16px; }
+  .themes { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; position: sticky; top: 0; padding: 10px 0; background: #0d0c15; z-index: 5; }
+  .themes button { background: #1c1a2a; color: var(--fg); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; font: inherit; cursor: pointer; }
+  .themes button[aria-pressed="true"] { background: var(--fg); color: #111; }
+  figure { margin: 0 0 40px; }
+  figcaption { margin-top: 10px; }
+  figcaption b { font-size: 17px; }
+  figcaption span { color: var(--muted); display: block; }
+
+  /* One mocked Cocon window; every size is relative to its width (cqw). */
+  .screen { position: relative; aspect-ratio: 16 / 10; border-radius: 14px; overflow: hidden; container-type: inline-size; border: 1px solid var(--line); font-size: 1.05cqw; }
+  .bg { position: absolute; inset: 0; background: #000 var(--poster) center / cover no-repeat; transition: background-image .4s; }
+  .scrim { position: absolute; inset: 0; }
+  .ui { position: absolute; inset: 0; padding: 1.1cqw; display: grid; gap: 1.1cqw; }
+  .glass { border: 1px solid var(--line); border-radius: 1.2cqw; padding: 1.2cqw; }
+  .row { display: flex; align-items: center; gap: .8cqw; }
+  .nav div { padding: .5cqw .7cqw; border-radius: .7cqw; margin-bottom: .3cqw; }
+  .nav .on { background: rgb(255 255 255 / .1); }
+  h2 { font-size: 1.9cqw; margin: 0 0 1cqw; }
+  .add { border: 1px solid var(--line); border-radius: .8cqw; padding: .7cqw 1cqw; color: var(--muted); margin-bottom: 1.2cqw; background: rgb(255 255 255 / .05); }
+  .task { padding: .8cqw .4cqw; border-bottom: 1px solid var(--line); }
+  .task i { width: 1.3cqw; height: 1.3cqw; border: 2px solid var(--muted); border-radius: 50%; flex: none; }
+  .task em { font-style: normal; font-size: .9cqw; color: var(--muted); margin-left: auto; }
+  .dot { width: .7cqw; height: .7cqw; border-radius: 50%; display: inline-block; }
+  .ring { width: 14cqw; height: 14cqw; border-radius: 50%; border: .5cqw solid rgb(255 255 255 / .15); border-top-color: var(--accent); margin: .5cqw auto 1cqw; display: grid; place-items: center; text-align: center; }
+  .ring b { font-size: 3.2cqw; font-weight: 600; letter-spacing: -.05cqw; display: block; line-height: 1; }
+  .ring small { color: var(--muted); }
+  .play { width: 3.6cqw; height: 3.6cqw; border-radius: 50%; background: var(--accent); color: #111; display: grid; place-items: center; margin: 0 auto; font-size: 1.4cqw; }
+  .sound { margin-top: 1.4cqw; }
+  .bar { height: .4cqw; border-radius: 1cqw; background: rgb(255 255 255 / .15); margin-top: .6cqw; }
+  .bar::before { content: ""; display: block; height: 100%; width: 60%; border-radius: inherit; background: var(--accent); }
+  .muted { color: var(--muted); }
+
+  /* Actuel: heavy frosted glass everywhere. */
+  .actuel .scrim { background: rgb(8 7 16 / .3); }
+  .actuel .ui, .clair .ui { grid-template-columns: 13% 1fr 27%; }
+  .actuel .glass { background: rgb(20 18 34 / .46); backdrop-filter: blur(1.5cqw) saturate(1.2); }
+
+  /* A: clear glass, the picture stays sharp behind the panels. */
+  .clair .scrim { background: rgb(8 7 16 / .08); }
+  .clair .glass { background: rgb(14 12 24 / .38); backdrop-filter: blur(.2cqw); text-shadow: 0 1px 3px rgb(0 0 0 / .6); }
+
+  /* B: the interface moves to the right, the rest of the window is left open. */
+  .fenetre .scrim { background: linear-gradient(90deg, transparent 45%, rgb(8 7 16 / .45) 70%); }
+  .fenetre .ui { grid-template-columns: 4.2cqw 1fr 34%; }
+  .fenetre .rail { background: rgb(20 18 34 / .4); backdrop-filter: blur(1cqw); padding: 1cqw .6cqw; text-align: center; font-size: 1.5cqw; line-height: 2.6; }
+  .fenetre .float { align-self: start; text-shadow: 0 2px 10px rgb(0 0 0 / .7); padding: 1cqw 1.5cqw; }
+  .fenetre .float b { font-size: 6cqw; font-weight: 600; line-height: 1; display: block; letter-spacing: -.1cqw; }
+  .fenetre .side { display: grid; gap: 1.1cqw; grid-template-rows: 1fr auto; min-height: 0; }
+  .fenetre .glass { background: rgb(20 18 34 / .5); backdrop-filter: blur(1.2cqw) saturate(1.2); }
+
+  /* C: interface hidden, only a small pill stays. */
+  .vitrine .pill { position: absolute; left: 50%; bottom: 2.5cqw; transform: translateX(-50%); display: flex; gap: 1.2cqw; align-items: center; padding: .8cqw 1.6cqw; border-radius: 99px; background: rgb(0 0 0 / .35); backdrop-filter: blur(.8cqw); border: 1px solid var(--line); white-space: nowrap; }
+  .vitrine .pill b { font-size: 1.8cqw; font-weight: 600; }
+  .vitrine .btn { border: 1px solid var(--line); border-radius: 99px; padding: .3cqw 1cqw; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Voir le fond sans flou</h1>
+  <p class="lead">Aujourd'hui, les panneaux de l'app recouvrent presque tout l'écran avec un verre dépoli très flou : la vidéo n'est visible qu'en bouillie. Trois pistes, avec le vrai visuel de chaque ambiance (image fixe ici, la vidéo bouge dans l'app).</p>
+  <div class="themes" role="group" aria-label="Ambiance">
+    <button data-t="foret" aria-pressed="true">🌲 Forêt</button>
+    <button data-t="pluie">🌧️ Pluie</button>
+    <button data-t="cheminee">🔥 Feu</button>
+    <button data-t="mer">🌊 Mer</button>
+    <button data-t="cafe">☕ Café</button>
+    <button data-t="soiree">🌃 Soirée</button>
+  </div>
+
+  <template id="sidebar">
+    <div class="glass nav">
+      <div><b>🌱 Cocon</b></div>
+      <div class="on">⏱ Minuteur</div><div>✅ Tâches</div><div>📊 Stats</div><div>🎧 Ambiances</div><div>⚙️ Réglages</div>
+    </div>
+  </template>
+  <template id="tasks">
+    <div class="glass">
+      <h2>Aujourd'hui</h2>
+      <div class="add">+ Ajouter une tâche…  <span class="muted">#Maths demain 18h</span></div>
+      <div class="task row"><i></i>Réviser chap. 3<span class="dot" style="background:#7aa2ff"></span><em>🍅 2</em></div>
+      <div class="task row"><i></i>Exos de thermo<span class="dot" style="background:#ff9f6b"></span><em>🍅 3</em></div>
+      <div class="task row"><i></i>Lire l'article d'anglais<span class="dot" style="background:#c79bff"></span><em>🍅 1</em></div>
+      <div class="task row"><i></i>Fiche de synthèse TP<span class="dot" style="background:#6fd3b8"></span><em>🍅 2</em></div>
+    </div>
+  </template>
+  <template id="sound">
+    <div class="glass sound">
+      <div class="row"><b class="tname">🌲 Forêt ensoleillée</b><span class="muted" style="margin-left:auto">▶</span></div>
+      <div class="bar"></div>
+    </div>
+  </template>
+
+  <figure>
+    <div class="screen actuel"><div class="bg"></div><div class="scrim"></div>
+      <div class="ui"><slot-sidebar></slot-sidebar><slot-tasks></slot-tasks>
+        <div class="glass"><div class="ring"><div><b>25:00</b><small>Focus</small></div></div><div class="play">▶</div><slot-sound></slot-sound></div>
+      </div>
+    </div>
+    <figcaption><b>Actuel</b><span>Verre très dépoli partout + voile sombre : on devine à peine la vidéo.</span></figcaption>
+  </figure>
+
+  <figure>
+    <div class="screen clair"><div class="bg"></div><div class="scrim"></div>
+      <div class="ui"><slot-sidebar></slot-sidebar><slot-tasks></slot-tasks>
+        <div class="glass"><div class="ring"><div><b>25:00</b><small>Focus</small></div></div><div class="play">▶</div><slot-sound></slot-sound></div>
+      </div>
+    </div>
+    <figcaption><b>A · Verre clair</b><span>Même disposition, mais panneaux presque transparents et quasi sans flou : la vidéo reste nette derrière. Le texte garde une ombre pour rester lisible.</span></figcaption>
+  </figure>
+
+  <figure>
+    <div class="screen fenetre"><div class="bg"></div><div class="scrim"></div>
+      <div class="ui">
+        <div class="rail">🌱<br>⏱<br>✅<br>📊<br>🎧<br>⚙️</div>
+        <div class="float"><b>25:00</b>Focus · Réviser chap. 3</div>
+        <div class="side"><slot-tasks></slot-tasks><slot-sound></slot-sound></div>
+      </div>
+    </div>
+    <figcaption><b>B · Fenêtre dégagée</b><span>Menu réduit à une barre d'icônes, tâches et son regroupés à droite, minuteur posé directement sur la vidéo : les deux tiers de l'écran montrent le fond net.</span></figcaption>
+  </figure>
+
+  <figure>
+    <div class="screen vitrine"><div class="bg"></div><div class="scrim"></div>
+      <div class="pill"><b>25:00</b><span>⏸</span><span class="btn">👁 Afficher l'interface</span></div>
+    </div>
+    <figcaption><b>C · Bouton « Voir le fond »</b><span>Un bouton (et la touche <kbd>V</kbd>) cache toute l'interface : fond en plein écran, net, sans voile. Il reste juste le minuteur. Se combine avec A ou B.</span></figcaption>
+  </figure>
+</main>
+<script>
+  const names = { foret: '🌲 Forêt ensoleillée', pluie: '🌧️ Pluie sur la fenêtre', cheminee: '🔥 Feu de cheminée', mer: '🌊 Mer au coucher du soleil', cafe: '☕ Café cosy', soiree: '🌃 Soirée studieuse' }
+  for (const k of ['sidebar', 'tasks', 'sound'])
+    document.querySelectorAll('slot-' + k).forEach((s) => s.replaceWith(document.getElementById(k).content.cloneNode(true)))
+  const pick = (t) => {
+    document.documentElement.style.setProperty('--poster', `url(/ambiences/${t}.jpg)`)
+    document.querySelectorAll('.tname').forEach((n) => (n.textContent = names[t]))
+    document.querySelectorAll('.themes button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.t === t))
+  }
+  document.querySelector('.themes').addEventListener('click', (e) => e.target.dataset.t && pick(e.target.dataset.t))
+  pick('foret')
+</script>
+</body>
+</html>
