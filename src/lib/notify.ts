@@ -12,7 +12,7 @@ export function requestNotifyPermission() {
 export function notify(title: string, body: string, force = false) {
   if (!useSettings.getState().notify || !notificationsSupported() || Notification.permission !== 'granted') return
   if (!force && document.visibilityState === 'visible' && document.hasFocus()) return
-  const options = { body, icon: '/icon-192.png', tag: 'cocon', lang: 'en' }
+  const options = { body, icon: `${import.meta.env.BASE_URL}icon-192.png`, tag: 'cocon', lang: 'en' }
   try {
     new Notification(title, options)
   } catch {

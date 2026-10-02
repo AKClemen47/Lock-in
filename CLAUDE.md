@@ -8,4 +8,5 @@
 - Couleurs des matières : `PROJECT_COLORS` validée (dataviz) ; ne pas ajouter de teinte sans revalider.
 - Nouveau thème d'ambiance : id dans `THEME_IDS` (`store/settings.ts`), vidéo + poster dans `public/ambiences/<id>.mp4/.jpg`, entrée dans `scenes/themes.ts`, couches dans `audio/soundThemes.ts`.
 - Textes de l'interface en anglais (dates en-GB, heures 24 h). Fichiers ≤ ~400 lignes.
+- Mise en ligne : GitHub Pages via `.github/workflows/deploy.yml` (à chaque push sur `master`, adresse `/Lock-in/`) ; tout chemin vers `public/` passe par `import.meta.env.BASE_URL`, jamais `/…` en dur.
 - Debug dans le navigateur : `await import('/src/store/settings.ts')` donne la même instance que l'app.

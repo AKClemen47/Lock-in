@@ -47,7 +47,7 @@ export function Rail({ lists, onLists }: { lists: boolean; onLists: () => void }
   const { view, set } = useUi()
   return (
     <nav aria-label="Main navigation" className="glass flex w-16 shrink-0 flex-col items-center gap-1 rounded-2xl py-3">
-      <img src="/icon.svg" alt="Lock-in" className="mb-3 size-8" />
+      <img src={`${import.meta.env.BASE_URL}icon.svg`} alt="Lock-in" className="mb-3 size-8" />
       {NAV.slice(0, 1).map(({ view: v, label, icon: Icon }) => (
         <RailBtn key={v} label={label} active={view === v && !lists} aria-current={view === v ? 'page' : undefined} onClick={() => set({ view: v })}>
           <Icon size={20} />
