@@ -7,9 +7,10 @@
     </linearGradient>
   </defs>
   <rect width="512" height="512" rx="112" fill="url(#bg)"/>
-  <circle cx="256" cy="256" r="150" fill="none" stroke="#ffffff" stroke-opacity="0.25" stroke-width="28"/>
-  <path d="M256 106 A150 150 0 1 1 126 331" fill="none" stroke="#ffe2c4" stroke-width="28" stroke-linecap="round"/>
-  <path d="M256 330 C256 280 256 250 256 225" stroke="#ffe2c4" stroke-width="16" stroke-linecap="round"/>
-  <path d="M256 262 C214 262 190 236 186 196 C228 196 254 222 256 262 Z" fill="#b8f0c8"/>
-  <path d="M256 238 C298 238 322 212 326 172 C284 172 258 198 256 238 Z" fill="#b8f0c8"/>
+  <path d="M176 252 V204 a80 80 0 0 1 160 0 V252" fill="none" stroke="#b8f0c8" stroke-width="30" stroke-linecap="round"/>
+  <path d="M256 126 C222 126 200 106 196 74 C232 74 254 94 256 126 Z" fill="#b8f0c8"/>
+  <path d="M256 126 C290 126 312 106 316 74 C280 74 258 94 256 126 Z" fill="#b8f0c8"/>
+  <rect x="136" y="236" width="240" height="188" rx="48" fill="#ffe2c4"/>
+  <circle cx="256" cy="312" r="26" fill="#2d2a5a"/>
+  <path d="M242 326 h28 l10 50 h-48 z" fill="#2d2a5a"/>
 </svg>
